@@ -1,585 +1,1193 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>SWIFT — SWAT+ Input File Tool</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet"/>
-<style>
-:root {
-  --bg:           #0d0d0d;
-  --surface:      #141414;
-  --surface2:     #1c1c1c;
-  --border:       #2a2a2a;
-  --border-accent:#3a6b5c;
-  --text:         #e8e4dc;
-  --text-muted:   #6b6b6b;
-  --text-dim:     #9a9a9a;
-  --accent:       #4a9b7f;
-  --accent-dim:   #2d5e4d;
-  --accent-glow:  rgba(74,155,127,0.15);
-  --warn:         #c4822a;
-  --mono:         'IBM Plex Mono', monospace;
-  --sans:         'IBM Plex Sans', sans-serif;
-}
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 15px; line-height: 1.6; overflow-x: hidden; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SWIFT — SWAT+ Input File Tool</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap"
+    rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0d0d0d;
+      --surface: #141414;
+      --surface2: #1c1c1c;
+      --border: #2a2a2a;
+      --border-accent: #3a6b5c;
+      --text: #e8e4dc;
+      --text-muted: #6b6b6b;
+      --text-dim: #9a9a9a;
+      --accent: #4a9b7f;
+      --accent-dim: #2d5e4d;
+      --accent-glow: rgba(74, 155, 127, 0.15);
+      --warn: #c4822a;
+      --mono: 'IBM Plex Mono', monospace;
+      --sans: 'IBM Plex Sans', sans-serif;
+    }
 
-/* ── NAV ── */
-nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 2rem; height: 60px;
-  background: rgba(13,13,13,0.92);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
-}
-.nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-.logo-mark {
-  width: 34px; height: 34px;
-  border: 2px solid var(--accent); border-radius: 4px;
-  display: grid; place-items: center;
-  font-family: var(--mono); font-size: 12px; font-weight: 600;
-  color: var(--accent);
-}
-.nav-wordmark { font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--text); letter-spacing: 0.06em; }
-.nav-sub { font-family: var(--mono); font-size: 10px; color: var(--text-muted); letter-spacing: 0.04em; }
-.nav-links { display: flex; gap: 2rem; list-style: none; }
-.nav-links a { font-family: var(--mono); font-size: 11px; color: var(--text-muted); text-decoration: none; letter-spacing: 0.06em; text-transform: uppercase; transition: color 0.2s; }
-.nav-links a:hover { color: var(--accent); }
-.nav-cta {
-  font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
-  color: #0d0d0d; background: var(--accent); padding: 0.45rem 1.2rem; border-radius: 3px;
-  text-decoration: none; font-weight: 600; transition: filter 0.2s, transform 0.15s;
-}
-.nav-cta:hover { filter: brightness(1.1); transform: translateY(-1px); }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-/* ── HERO ── */
-.hero {
-  min-height: 100vh; display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  text-align: center; padding: 8rem 2rem 4rem;
-  position: relative;
-}
-.hero-grid {
-  position: absolute; inset: 0;
-  background-image:
-    linear-gradient(rgba(74,155,127,0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(74,155,127,0.05) 1px, transparent 1px);
-  background-size: 40px 40px;
-  mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black, transparent);
-}
-.hero-eyebrow {
-  font-family: var(--mono); font-size: 10px; color: var(--accent);
-  letter-spacing: 0.22em; text-transform: uppercase; margin-bottom: 1.5rem;
-  opacity: 0; animation: fadeUp 0.5s ease 0.1s forwards;
-}
-.hero-title {
-  font-family: var(--mono); font-size: clamp(3.5rem, 9vw, 7.5rem);
-  font-weight: 600; line-height: 1; letter-spacing: -0.01em;
-  color: var(--text); margin-bottom: 0.5rem;
-  opacity: 0; animation: fadeUp 0.5s ease 0.2s forwards;
-}
-.hero-title span { color: var(--accent); }
-.hero-sub {
-  font-family: var(--mono); font-size: clamp(0.7rem, 1.5vw, 0.85rem);
-  color: var(--text-muted); letter-spacing: 0.14em; text-transform: uppercase;
-  margin-bottom: 2rem;
-  opacity: 0; animation: fadeUp 0.5s ease 0.3s forwards;
-}
-.hero-desc {
-  font-family: var(--sans); font-size: 1.05rem; color: var(--text-dim);
-  max-width: 520px; margin: 0 auto 2.5rem; font-weight: 300; line-height: 1.8;
-  opacity: 0; animation: fadeUp 0.5s ease 0.4s forwards;
-}
-.hero-desc strong { color: var(--text); font-weight: 500; }
-.hero-actions {
-  display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
-  margin-bottom: 3rem;
-  opacity: 0; animation: fadeUp 0.5s ease 0.5s forwards;
-}
-.btn-primary {
-  font-family: var(--mono); font-size: 11px; font-weight: 600;
-  letter-spacing: 0.08em; text-transform: uppercase;
-  color: #0d0d0d; background: var(--accent);
-  padding: 0.75rem 2rem; border-radius: 3px; text-decoration: none;
-  transition: filter 0.2s, transform 0.15s;
-}
-.btn-primary:hover { filter: brightness(1.1); transform: translateY(-2px); }
-.btn-outline {
-  font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em;
-  text-transform: uppercase; color: var(--text-dim);
-  border: 1px solid var(--border); padding: 0.75rem 2rem;
-  border-radius: 3px; text-decoration: none;
-  transition: border-color 0.2s, color 0.2s, transform 0.15s;
-}
-.btn-outline:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
-.hero-meta {
-  display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap;
-  font-family: var(--mono); font-size: 10px; color: var(--text-muted);
-  letter-spacing: 0.1em; text-transform: uppercase;
-  opacity: 0; animation: fadeUp 0.5s ease 0.6s forwards;
-}
-.hero-meta span { display: flex; align-items: center; gap: 0.4rem; }
-.hero-meta span::before { content: '·'; color: var(--accent); }
+    html {
+      scroll-behavior: smooth;
+    }
 
-/* ── SCREENSHOTS ── */
-.screenshots {
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-  padding: 4rem 0;
-  overflow: hidden;
-}
-.ss-label {
-  font-family: var(--mono); font-size: 10px; color: var(--text-muted);
-  letter-spacing: 0.2em; text-transform: uppercase;
-  text-align: center; margin-bottom: 2rem;
-}
-.ss-track {
-  display: flex; gap: 1.5rem; padding: 0 2rem;
-  overflow-x: auto; scroll-snap-type: x mandatory;
-  scrollbar-width: none; cursor: grab;
-}
-.ss-track::-webkit-scrollbar { display: none; }
-.ss-item {
-  flex: 0 0 auto; scroll-snap-align: center;
-  width: min(760px, 85vw);
-  border: 1px solid var(--border); border-radius: 8px;
-  overflow: hidden; position: relative;
-  box-shadow: 0 16px 48px rgba(0,0,0,0.5);
-  transition: transform 0.3s, box-shadow 0.3s;
-  background: var(--bg);
-}
-.ss-item:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 24px 64px rgba(0,0,0,0.6), 0 0 0 1px rgba(74,155,127,0.2);
-}
-.ss-item img, .ss-item svg { width: 100%; display: block; }
-.ss-caption {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  background: linear-gradient(transparent, rgba(13,13,13,0.95));
-  padding: 1.5rem 1rem 0.75rem;
-  font-family: var(--mono); font-size: 10px; color: var(--accent);
-  letter-spacing: 0.12em; text-transform: uppercase;
-}
-.ss-dots { display: flex; justify-content: center; gap: 0.5rem; margin-top: 1.5rem; }
-.ss-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--border); border: none; cursor: pointer; padding: 0; transition: background 0.2s; }
-.ss-dot.active { background: var(--accent); }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
 
-/* ── SHARED SECTION ── */
-.container { max-width: 1060px; margin: 0 auto; }
-section { padding: 6rem 2rem; }
-.s-label {
-  font-family: var(--mono); font-size: 10px; color: var(--accent);
-  letter-spacing: 0.22em; text-transform: uppercase; margin-bottom: 0.6rem;
-}
-.s-title {
-  font-family: var(--mono); font-size: clamp(1.4rem, 3vw, 2.1rem);
-  font-weight: 600; line-height: 1.2; margin-bottom: 0.75rem; color: var(--text);
-}
-.s-body { font-family: var(--sans); font-size: 0.95rem; color: var(--text-dim); font-weight: 300; max-width: 520px; line-height: 1.8; }
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      height: 60px;
+      background: rgba(13, 13, 13, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
 
-/* ── FEATURES ── */
-#features { background: var(--bg); }
-.features-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-  gap: 1px; background: var(--border);
-  border: 1px solid var(--border); border-radius: 6px;
-  overflow: hidden; margin-top: 3.5rem;
-}
-.feat-card { background: var(--surface2); padding: 1.75rem; transition: background 0.2s; }
-.feat-card:hover { background: var(--surface); }
-.feat-icon { font-size: 1.3rem; margin-bottom: 0.75rem; }
-.feat-name { font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--text); letter-spacing: 0.04em; margin-bottom: 0.4rem; }
-.feat-desc { font-family: var(--sans); font-size: 0.88rem; color: var(--text-dim); font-weight: 300; line-height: 1.7; }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
 
-/* ── HOW IT WORKS ── */
-#how { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-top: 3.5rem; }
-.step { padding: 1.75rem; border-left: 1px solid var(--border); }
-.step:first-child { border-left: none; }
-.step-num {
-  font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--accent);
-  background: var(--accent-glow); border: 1px solid var(--border-accent);
-  border-radius: 3px; width: 48px; height: 48px;
-  display: grid; place-items: center; margin-bottom: 1.1rem;
-}
-.step-title { font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--text); letter-spacing: 0.04em; margin-bottom: 0.4rem; }
-.step-desc { font-family: var(--sans); font-size: 0.88rem; color: var(--text-dim); font-weight: 300; line-height: 1.7; }
+    .logo-mark {
+      width: 34px;
+      height: 34px;
+      border: 2px solid var(--accent);
+      border-radius: 4px;
+      display: grid;
+      place-items: center;
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+    }
 
-/* ── OUTPUTS ── */
-#outputs { background: var(--bg); }
-.outputs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin-top: 3.5rem; }
-.out-row { display: flex; align-items: flex-start; gap: 1rem; padding: 1.1rem 1.25rem; background: var(--surface2); transition: background 0.2s; }
-.out-row:hover { background: var(--surface); }
-.out-ext {
-  font-family: var(--mono); font-size: 10px; font-weight: 600; color: var(--accent);
-  background: var(--accent-glow); border: 1px solid var(--border-accent);
-  padding: 0.2rem 0.5rem; border-radius: 2px; white-space: nowrap;
-  letter-spacing: 0.06em; flex-shrink: 0; margin-top: 2px;
-}
-.out-name { font-family: var(--mono); font-size: 11px; color: var(--text); margin-bottom: 0.15rem; }
-.out-desc { font-family: var(--sans); font-size: 0.82rem; color: var(--text-muted); font-weight: 300; }
+    .nav-wordmark {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      letter-spacing: 0.06em;
+    }
 
-/* ── CITE ── */
-#cite { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-.cite-box { margin-top: 2rem; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
-.cite-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0.6rem 1.1rem; background: var(--surface2);
-  border-bottom: 1px solid var(--border);
-  font-family: var(--mono); font-size: 10px; color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase;
-}
-.copy-btn {
-  font-family: var(--mono); font-size: 10px; color: var(--accent);
-  background: none; border: 1px solid var(--border-accent);
-  padding: 0.2rem 0.6rem; border-radius: 2px; cursor: pointer;
-  letter-spacing: 0.06em; text-transform: uppercase; transition: background 0.2s;
-}
-.copy-btn:hover { background: var(--accent-glow); }
-.cite-body { padding: 1.1rem; font-family: var(--mono); font-size: 12px; color: var(--text); line-height: 1.9; word-break: break-word; }
-.cite-key { color: var(--accent); }
-.doi-badge {
-  display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 1.25rem;
-  font-family: var(--mono); font-size: 11px; color: var(--text-muted);
-  border: 1px solid var(--border); padding: 0.45rem 0.9rem;
-  border-radius: 3px; text-decoration: none; transition: border-color 0.2s, color 0.2s;
-}
-.doi-badge:hover { border-color: var(--accent); color: var(--accent); }
+    .nav-sub {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+    }
 
-/* ── ABOUT ── */
-#about { background: var(--bg); }
-.author-cards { display: flex; gap: 1.5rem; margin-top: 3.5rem; flex-wrap: wrap; }
-.author-card {
-  flex: 1; min-width: 260px; max-width: 340px;
-  border: 1px solid var(--border); border-radius: 6px;
-  padding: 1.75rem; background: var(--surface2);
-  transition: border-color 0.2s;
-}
-.author-card:hover { border-color: var(--border-accent); }
-.author-avatar {
-  width: 60px; height: 60px; border-radius: 50%;
-  border: 2px solid var(--accent);
-  background: var(--accent-glow);
-  display: grid; place-items: center;
-  font-family: var(--mono); font-size: 1rem; font-weight: 600;
-  color: var(--accent); margin-bottom: 1rem;
-}
-.author-name { font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 0.2rem; }
-.author-title { font-family: var(--sans); font-size: 0.82rem; color: var(--accent); font-weight: 400; margin-bottom: 0.75rem; }
-.author-inst { font-family: var(--sans); font-size: 0.82rem; color: var(--text-muted); font-weight: 300; line-height: 1.6; margin-bottom: 1.25rem; }
-.author-links { display: flex; flex-direction: column; gap: 0.5rem; }
-.author-link {
-  font-family: var(--mono); font-size: 10px; color: var(--accent);
-  text-decoration: none; letter-spacing: 0.04em;
-  display: flex; align-items: center; gap: 0.4rem;
-  transition: opacity 0.2s;
-}
-.author-link:hover { opacity: 0.75; text-decoration: underline; }
-.author-divider { width: 100%; height: 1px; background: var(--border); margin: 1rem 0; }
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
 
-/* ── FOOTER ── */
-footer {
-  background: var(--surface); border-top: 1px solid var(--border);
-  padding: 2rem; display: flex; align-items: center;
-  justify-content: space-between; flex-wrap: wrap; gap: 1rem;
-}
-.footer-l { font-family: var(--mono); font-size: 11px; color: var(--text-muted); letter-spacing: 0.06em; }
-.footer-l span { color: var(--accent); }
-.footer-r { font-family: var(--mono); font-size: 11px; color: var(--text-muted); }
+    .nav-links a {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      text-decoration: none;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
 
-/* ── ANIMATIONS ── */
-@keyframes fadeUp { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:none; } }
-.reveal { opacity:0; transform:translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
-.reveal.visible { opacity:1; transform:none; }
+    .nav-links a:hover {
+      color: var(--accent);
+    }
 
-@media(max-width:768px){
-  nav { padding: 0 1.25rem; }
-  .nav-links { display: none; }
-  .steps { grid-template-columns: 1fr; }
-  .step { border-left: none; border-top: 1px solid var(--border); }
-  .step:first-child { border-top: none; }
-  .outputs-grid { grid-template-columns: 1fr; }
-  footer { flex-direction: column; text-align: center; }
-}
-</style>
+    .nav-cta {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #0d0d0d;
+      background: var(--accent);
+      padding: 0.45rem 1.2rem;
+      border-radius: 3px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: filter 0.2s, transform 0.15s;
+    }
+
+    .nav-cta:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 8rem 2rem 4rem;
+      position: relative;
+    }
+
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(74, 155, 127, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(74, 155, 127, 0.05) 1px, transparent 1px);
+      background-size: 40px 40px;
+      mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black, transparent);
+    }
+
+    .hero-eyebrow {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--accent);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.5s ease 0.1s forwards;
+    }
+
+    .hero-title {
+      font-family: var(--mono);
+      font-size: clamp(3.5rem, 9vw, 7.5rem);
+      font-weight: 600;
+      line-height: 1;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+      opacity: 0;
+      animation: fadeUp 0.5s ease 0.2s forwards;
+    }
+
+    .hero-title span {
+      color: var(--accent);
+    }
+
+    .hero-sub {
+      font-family: var(--mono);
+      font-size: clamp(0.7rem, 1.5vw, 0.85rem);
+      color: var(--text-muted);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeUp 0.5s ease 0.3s forwards;
+    }
+
+    .hero-desc {
+      font-family: var(--sans);
+      font-size: 1.05rem;
+      color: var(--text-dim);
+      max-width: 520px;
+      margin: 0 auto 2.5rem;
+      font-weight: 300;
+      line-height: 1.8;
+      opacity: 0;
+      animation: fadeUp 0.5s ease 0.4s forwards;
+    }
+
+    .hero-desc strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 3rem;
+      opacity: 0;
+      animation: fadeUp 0.5s ease 0.5s forwards;
+    }
+
+    .btn-primary {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #0d0d0d;
+      background: var(--accent);
+      padding: 0.75rem 2rem;
+      border-radius: 3px;
+      text-decoration: none;
+      transition: filter 0.2s, transform 0.15s;
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.1);
+      transform: translateY(-2px);
+    }
+
+    .btn-outline {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      border: 1px solid var(--border);
+      padding: 0.75rem 2rem;
+      border-radius: 3px;
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s, transform 0.15s;
+    }
+
+    .btn-outline:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .hero-meta {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      opacity: 0;
+      animation: fadeUp 0.5s ease 0.6s forwards;
+    }
+
+    .hero-meta span {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .hero-meta span::before {
+      content: '·';
+      color: var(--accent);
+    }
+
+    /* ── SCREENSHOTS ── */
+    .screenshots {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 4rem 0;
+      overflow: hidden;
+    }
+
+    .ss-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-muted);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .ss-track {
+      display: flex;
+      gap: 1.5rem;
+      padding: 0 2rem;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      cursor: grab;
+    }
+
+    .ss-track::-webkit-scrollbar {
+      display: none;
+    }
+
+    .ss-item {
+      flex: 0 0 auto;
+      scroll-snap-align: center;
+      width: min(760px, 85vw);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+      transition: transform 0.3s, box-shadow 0.3s;
+      background: var(--bg);
+    }
+
+    .ss-item:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(74, 155, 127, 0.2);
+    }
+
+    .ss-item img,
+    .ss-item svg {
+      width: 100%;
+      display: block;
+    }
+
+    .ss-caption {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(transparent, rgba(13, 13, 13, 0.95));
+      padding: 1.5rem 1rem 0.75rem;
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--accent);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .ss-dots {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .ss-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--border);
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      transition: background 0.2s;
+    }
+
+    .ss-dot.active {
+      background: var(--accent);
+    }
+
+    /* ── SHARED SECTION ── */
+    .container {
+      max-width: 1060px;
+      margin: 0 auto;
+    }
+
+    section {
+      padding: 6rem 2rem;
+    }
+
+    .s-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--accent);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      margin-bottom: 0.6rem;
+    }
+
+    .s-title {
+      font-family: var(--mono);
+      font-size: clamp(1.4rem, 3vw, 2.1rem);
+      font-weight: 600;
+      line-height: 1.2;
+      margin-bottom: 0.75rem;
+      color: var(--text);
+    }
+
+    .s-body {
+      font-family: var(--sans);
+      font-size: 0.95rem;
+      color: var(--text-dim);
+      font-weight: 300;
+      max-width: 520px;
+      line-height: 1.8;
+    }
+
+    /* ── FEATURES ── */
+    #features {
+      background: var(--bg);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-top: 3.5rem;
+    }
+
+    .feat-card {
+      background: var(--surface2);
+      padding: 1.75rem;
+      transition: background 0.2s;
+    }
+
+    .feat-card:hover {
+      background: var(--surface);
+    }
+
+    .feat-icon {
+      font-size: 1.3rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .feat-name {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: 0.04em;
+      margin-bottom: 0.4rem;
+    }
+
+    .feat-desc {
+      font-family: var(--sans);
+      font-size: 0.88rem;
+      color: var(--text-dim);
+      font-weight: 300;
+      line-height: 1.7;
+    }
+
+    /* ── HOW IT WORKS ── */
+    #how {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      margin-top: 3.5rem;
+    }
+
+    .step {
+      padding: 1.75rem;
+      border-left: 1px solid var(--border);
+    }
+
+    .step:first-child {
+      border-left: none;
+    }
+
+    .step-num {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent);
+      background: var(--accent-glow);
+      border: 1px solid var(--border-accent);
+      border-radius: 3px;
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 1.1rem;
+    }
+
+    .step-title {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: 0.04em;
+      margin-bottom: 0.4rem;
+    }
+
+    .step-desc {
+      font-family: var(--sans);
+      font-size: 0.88rem;
+      color: var(--text-dim);
+      font-weight: 300;
+      line-height: 1.7;
+    }
+
+    /* ── OUTPUTS ── */
+    #outputs {
+      background: var(--bg);
+    }
+
+    .outputs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-top: 3.5rem;
+    }
+
+    .out-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1.1rem 1.25rem;
+      background: var(--surface2);
+      transition: background 0.2s;
+    }
+
+    .out-row:hover {
+      background: var(--surface);
+    }
+
+    .out-ext {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--accent);
+      background: var(--accent-glow);
+      border: 1px solid var(--border-accent);
+      padding: 0.2rem 0.5rem;
+      border-radius: 2px;
+      white-space: nowrap;
+      letter-spacing: 0.06em;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .out-name {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text);
+      margin-bottom: 0.15rem;
+    }
+
+    .out-desc {
+      font-family: var(--sans);
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      font-weight: 300;
+    }
+
+    /* ── CITE ── */
+    #cite {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .cite-box {
+      margin-top: 2rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .cite-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.6rem 1.1rem;
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .copy-btn {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--accent);
+      background: none;
+      border: 1px solid var(--border-accent);
+      padding: 0.2rem 0.6rem;
+      border-radius: 2px;
+      cursor: pointer;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      transition: background 0.2s;
+    }
+
+    .copy-btn:hover {
+      background: var(--accent-glow);
+    }
+
+    .cite-body {
+      padding: 1.1rem;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text);
+      line-height: 1.9;
+      word-break: break-word;
+    }
+
+    .cite-key {
+      color: var(--accent);
+    }
+
+    .doi-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 1.25rem;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 0.45rem 0.9rem;
+      border-radius: 3px;
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .doi-badge:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ── ABOUT ── */
+    #about {
+      background: var(--bg);
+    }
+
+    .author-cards {
+      display: flex;
+      gap: 1.5rem;
+      margin-top: 3.5rem;
+      flex-wrap: wrap;
+    }
+
+    .author-card {
+      flex: 1;
+      min-width: 260px;
+      max-width: 340px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1.75rem;
+      background: var(--surface2);
+      transition: border-color 0.2s;
+    }
+
+    .author-card:hover {
+      border-color: var(--border-accent);
+    }
+
+    .author-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 2px solid var(--accent);
+      background: var(--accent-glow);
+      display: grid;
+      place-items: center;
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .author-name {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.2rem;
+    }
+
+    .author-title {
+      font-family: var(--sans);
+      font-size: 0.82rem;
+      color: var(--accent);
+      font-weight: 400;
+      margin-bottom: 0.75rem;
+    }
+
+    .author-inst {
+      font-family: var(--sans);
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      font-weight: 300;
+      line-height: 1.6;
+      margin-bottom: 1.25rem;
+    }
+
+    .author-links {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .author-link {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--accent);
+      text-decoration: none;
+      letter-spacing: 0.04em;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: opacity 0.2s;
+    }
+
+    .author-link:hover {
+      opacity: 0.75;
+      text-decoration: underline;
+    }
+
+    .author-divider {
+      width: 100%;
+      height: 1px;
+      background: var(--border);
+      margin: 1rem 0;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-l {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+    }
+
+    .footer-l span {
+      color: var(--accent);
+    }
+
+    .footer-r {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    @media(max-width:768px) {
+      nav {
+        padding: 0 1.25rem;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .steps {
+        grid-template-columns: 1fr;
+      }
+
+      .step {
+        border-left: none;
+        border-top: 1px solid var(--border);
+      }
+
+      .step:first-child {
+        border-top: none;
+      }
+
+      .outputs-grid {
+        grid-template-columns: 1fr;
+      }
+
+      footer {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- NAV -->
-<nav>
-  <a class="nav-logo" href="#">
-    <div class="logo-mark">SW</div>
-    <div>
-      <div class="nav-wordmark">SWIFT</div>
-      <div class="nav-sub">SWAT+ Input File Tool</div>
-    </div>
-  </a>
-  <ul class="nav-links">
-    <li><a href="#features">Features</a></li>
-    <li><a href="#how">Workflow</a></li>
-    <li><a href="#outputs">Outputs</a></li>
-    <li><a href="#cite">Cite</a></li>
-    <li><a href="#about">About</a></li>
-  </ul>
-  <a class="nav-cta" href="https://zenodo.org/records/19402122/files/SWIFT.exe?download=1">↓ Download</a>
-</nav>
-
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-grid"></div>
-  <p class="hero-eyebrow">Free &amp; Open Source &nbsp;·&nbsp; v1.0 &nbsp;·&nbsp; Windows</p>
-  <h1 class="hero-title">SW<span>I</span>FT</h1>
-  <p class="hero-sub">SWAT+ Input File Tool</p>
-  <p class="hero-desc">
-    Generate ready-to-use <strong>SWAT+ weather input files</strong> from multi-station CSV data.
-    No scripting. No manual formatting. Upload, configure, generate.
-  </p>
-  <div class="hero-actions">
-    <a class="btn-primary" href="https://zenodo.org/records/19402122/files/SWIFT.exe?download=1">↓ Download for Windows</a>
-    <a class="btn-outline" href="https://doi.org/10.5281/zenodo.19402122" target="_blank">View on Zenodo →</a>
-  </div>
-  <div class="hero-meta">
-    <span>Free to use</span>
-    <span>Works offline</span>
-    <span>NASA POWER integrated</span>
-    <span>No installation required</span>
-  </div>
-</section>
-
-<!-- SCREENSHOTS -->
-<div class="screenshots">
-  <p class="ss-label">Interface Preview — drag to explore</p>
-  <div class="ss-track" id="ssTrack">
-    <div class="ss-item">
-      <img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgOTAwIDU2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBmb250LWZhbWlseT0iJ0lCTSBQbGV4IE1vbm8nLG1vbm9zcGFjZSI+CiAgPHJlY3Qgd2lkdGg9IjkwMCIgaGVpZ2h0PSI1NjAiIGZpbGw9IiMwZDBkMGQiLz4KICA8IS0tIEhlYWRlciAtLT4KICA8cmVjdCB3aWR0aD0iOTAwIiBoZWlnaHQ9IjY1IiBmaWxsPSIjMTQxNDE0IiBzdHJva2U9IiMyYTJhMmEiIHN0cm9rZS13aWR0aD0iMSIvPgogIDxyZWN0IHg9IjE4IiB5PSIxNSIgd2lkdGg9IjM0IiBoZWlnaHQ9IjM0IiByeD0iNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNGE5YjdmIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8dGV4dCB4PSIzNSIgeT0iMzYiIGZpbGw9IiM0YTliN2YiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSI2MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlNXPC90ZXh0PgogIDx0ZXh0IHg9IjY2IiB5PSIzNCIgZmlsbD0iI2U4ZTRkYyIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjUwMCIgbGV0dGVyLXNwYWNpbmc9IjEiPlNXSUZUPC90ZXh0PgogIDx0ZXh0IHg9IjY2IiB5PSI0OSIgZmlsbD0iIzZiNmI2YiIgZm9udC1zaXplPSIxMCIgbGV0dGVyLXNwYWNpbmc9IjAuNSI+U1dBVCsgSW5wdXQgRmlsZSBUb29sIMK3IHYxLjA8L3RleHQ+CiAgPHRleHQgeD0iODIwIiB5PSIzNyIgZmlsbD0iIzRhOWI3ZiIgZm9udC1zaXplPSIxMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgbGV0dGVyLXNwYWNpbmc9IjEiPlNXQVQrIFJFQURZPC90ZXh0PgogIDxyZWN0IHg9Ijc3MyIgeT0iMjQiIHdpZHRoPSIxMDgiIGhlaWdodD0iMjAiIHJ4PSIyIiBmaWxsPSJub25lIiBzdHJva2U9IiMzYTZiNWMiIHN0cm9rZS13aWR0aD0iMSIvPgogIDwhLS0gU2lkZWJhciAtLT4KICA8cmVjdCB4PSIwIiB5PSI2NSIgd2lkdGg9IjI0MCIgaGVpZ2h0PSI0OTUiIGZpbGw9IiMxNDE0MTQiIHN0cm9rZT0iIzJhMmEyYSIgc3Ryb2tlLXdpZHRoPSIwLjUiLz4KICA8dGV4dCB4PSIxOCIgeT0iMTAwIiBmaWxsPSIjNmI2YjZiIiBmb250LXNpemU9IjkiIGxldHRlci1zcGFjaW5nPSIyIj5JTlBVVFM8L3RleHQ+CiAgPCEtLSBBY3RpdmUgaXRlbSAtLT4KICA8cmVjdCB4PSIxMCIgeT0iMTA4IiB3aWR0aD0iMjIwIiBoZWlnaHQ9IjM2IiByeD0iNCIgZmlsbD0icmdiYSg3NCwxNTUsMTI3LDAuMTUpIiBzdHJva2U9IiMzYTZiNWMiIHN0cm9rZS13aWR0aD0iMSIvPgogIDx0ZXh0IHg9IjI4IiB5PSIxMjkiIGZpbGw9IiM0YTliN2YiIGZvbnQtc2l6ZT0iMTAiPjAxPC90ZXh0PgogIDx0ZXh0IHg9IjQ4IiB5PSIxMjkiIGZpbGw9IiNlOGU0ZGMiIGZvbnQtc2l6ZT0iMTIiIGZvbnQtd2VpZ2h0PSI1MDAiPlN0YXRpb24gTWV0YWRhdGE8L3RleHQ+CiAgPCEtLSBPdGhlciBpdGVtcyAtLT4KICA8dGV4dCB4PSIyOCIgeT0iMTY4IiBmaWxsPSIjNmI2YjZiIiBmb250LXNpemU9IjEwIj4wMjwvdGV4dD4KICA8dGV4dCB4PSI0OCIgeT0iMTY4IiBmaWxsPSIjOWE5YTlhIiBmb250LXNpemU9IjEyIj5SZXF1aXJlZCBXZWF0aGVyPC90ZXh0PgogIDx0ZXh0IHg9IjI4IiB5PSIyMDUiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iMTAiPjAzPC90ZXh0PgogIDx0ZXh0IHg9IjQ4IiB5PSIyMDUiIGZpbGw9IiM5YTlhOWEiIGZvbnQtc2l6ZT0iMTIiPk9wdGlvbmFsIFdlYXRoZXI8L3RleHQ+CiAgPHRleHQgeD0iMTgiIHk9IjI0MCIgZmlsbD0iIzZiNmI2YiIgZm9udC1zaXplPSI5IiBsZXR0ZXItc3BhY2luZz0iMiI+U0VUVElOR1M8L3RleHQ+CiAgPHRleHQgeD0iMjgiIHk9IjI2NSIgZmlsbD0iIzZiNmI2YiIgZm9udC1zaXplPSIxMCI+MDQ8L3RleHQ+CiAgPHRleHQgeD0iNDgiIHk9IjI2NSIgZmlsbD0iIzlhOWE5YSIgZm9udC1zaXplPSIxMiI+U2V0dGluZ3M8L3RleHQ+CiAgPHRleHQgeD0iMTgiIHk9IjMwMCIgZmlsbD0iIzZiNmI2YiIgZm9udC1zaXplPSI5IiBsZXR0ZXItc3BhY2luZz0iMiI+T1VUUFVUPC90ZXh0PgogIDx0ZXh0IHg9IjI4IiB5PSIzMjUiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iMTAiPjA1PC90ZXh0PgogIDx0ZXh0IHg9IjQ4IiB5PSIzMjUiIGZpbGw9IiM5YTlhOWEiIGZvbnQtc2l6ZT0iMTIiPkdlbmVyYXRlICZhbXA7IERvd25sb2FkPC90ZXh0PgogIDwhLS0gTWFpbiBwYW5lbCAtLT4KICA8cmVjdCB4PSIzIiB5PSI5NyIgd2lkdGg9IjMiIGhlaWdodD0iMTQiIHJ4PSIyIiBmaWxsPSIjNGE5YjdmIi8+CiAgPHRleHQgeD0iMjYyIiB5PSIxMTAiIGZpbGw9IiNlOGU0ZGMiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSI2MDAiIGxldHRlci1zcGFjaW5nPSIwLjUiPlN0YXRpb24gTWV0YWRhdGE8L3RleHQ+CiAgPHRleHQgeD0iMjYyIiB5PSIxMzAiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iMTEiPlVwbG9hZCBhIENTViBkZXNjcmliaW5nIGVhY2ggd2VhdGhlciBzdGF0aW9uLiBPbmUgcm93IHBlciBzdGF0aW9uLjwvdGV4dD4KICA8IS0tIEluZm8gYm94IC0tPgogIDxyZWN0IHg9IjI1MCIgeT0iMTQ1IiB3aWR0aD0iNjIwIiBoZWlnaHQ9IjYyIiByeD0iNCIgZmlsbD0iIzFjMWMxYyIgc3Ryb2tlPSIjMmEyYTJhIiBzdHJva2Utd2lkdGg9IjEiLz4KICA8cmVjdCB4PSIyNTAiIHk9IjE0NSIgd2lkdGg9IjMiIGhlaWdodD0iNjIiIHJ4PSIyIiBmaWxsPSIjM2E2YjVjIi8+CiAgPHRleHQgeD0iMjY4IiB5PSIxNjUiIGZpbGw9IiM5YTlhOWEiIGZvbnQtc2l6ZT0iMTEiPlJlcXVpcmVkIGNvbHVtbnM6PC90ZXh0PgogIDxyZWN0IHg9IjM3OCIgeT0iMTUzIiB3aWR0aD0iMjAiIGhlaWdodD0iMTYiIHJ4PSIyIiBmaWxsPSJyZ2JhKDc0LDE1NSwxMjcsMC4xNSkiLz4KICA8dGV4dCB4PSIzODMiIHk9IjE2NSIgZmlsbD0iIzRhOWI3ZiIgZm9udC1zaXplPSIxMCI+aWQ8L3RleHQ+CiAgPHJlY3QgeD0iNDA0IiB5PSIxNTMiIHdpZHRoPSIzNiIgaGVpZ2h0PSIxNiIgcng9IjIiIGZpbGw9InJnYmEoNzQsMTU1LDEyNywwLjE1KSIvPgogIDx0ZXh0IHg9IjQwOSIgeT0iMTY1IiBmaWxsPSIjNGE5YjdmIiBmb250LXNpemU9IjEwIj5uYW1lPC90ZXh0PgogIDxyZWN0IHg9IjQ0NiIgeT0iMTUzIiB3aWR0aD0iMjIiIGhlaWdodD0iMTYiIHJ4PSIyIiBmaWxsPSJyZ2JhKDc0LDE1NSwxMjcsMC4xNSkiLz4KICA8dGV4dCB4PSI0NTEiIHk9IjE2NSIgZmlsbD0iIzRhOWI3ZiIgZm9udC1zaXplPSIxMCI+bGF0PC90ZXh0PgogIDxyZWN0IHg9IjQ3NCIgeT0iMTUzIiB3aWR0aD0iMjQiIGhlaWdodD0iMTYiIHJ4PSIyIiBmaWxsPSJyZ2JhKDc0LDE1NSwxMjcsMC4xNSkiLz4KICA8dGV4dCB4PSI0NzkiIHk9IjE2NSIgZmlsbD0iIzRhOWI3ZiIgZm9udC1zaXplPSIxMCI+bG9uPC90ZXh0PgogIDxyZWN0IHg9IjUwNCIgeT0iMTUzIiB3aWR0aD0iMjgiIGhlaWdodD0iMTYiIHJ4PSIyIiBmaWxsPSJyZ2JhKDc0LDE1NSwxMjcsMC4xNSkiLz4KICA8dGV4dCB4PSI1MDkiIHk9IjE2NSIgZmlsbD0iIzRhOWI3ZiIgZm9udC1zaXplPSIxMCI+ZWxldjwvdGV4dD4KICA8dGV4dCB4PSIyNjgiIHk9IjE5NSIgZmlsbD0iIzlhOWE5YSIgZm9udC1zaXplPSIxMSI+U3RhdGlvbiBuYW1lcyBiZWNvbWUgZmlsZW5hbWVzLiBVc2Ugc2ltcGxlIGFscGhhbnVtZXJpYyBuYW1lcy48L3RleHQ+CiAgPCEtLSBVcGxvYWQgY2FyZCAtLT4KICA8cmVjdCB4PSIyNTAiIHk9IjIyMiIgd2lkdGg9IjIwMCIgaGVpZ2h0PSIxMDAiIHJ4PSI2IiBmaWxsPSIjMWMxYzFjIiBzdHJva2U9IiMyYTJhMmEiIHN0cm9rZS13aWR0aD0iMSIvPgogIDx0ZXh0IHg9IjI2OCIgeT0iMjU3IiBmb250LXNpemU9IjE4Ij7wn5OLPC90ZXh0PgogIDx0ZXh0IHg9IjI2OCIgeT0iMjg0IiBmaWxsPSIjZThlNGRjIiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iNTAwIj5TdGF0aW9ucyBDU1Y8L3RleHQ+CiAgPHJlY3QgeD0iMjk4IiB5PSIyNzMiIHdpZHRoPSIyNiIgaGVpZ2h0PSIxNCIgcng9IjIiIGZpbGw9InJnYmEoNzQsMTU1LDEyNywwLjE1KSIvPgogIDx0ZXh0IHg9IjMwMSIgeT0iMjgzIiBmaWxsPSIjNGE5YjdmIiBmb250LXNpemU9IjkiIGxldHRlci1zcGFjaW5nPSIwLjUiPlJFUTwvdGV4dD4KICA8dGV4dCB4PSIyNjgiIHk9IjMwNCIgZmlsbD0iIzZiNmI2YiIgZm9udC1zaXplPSIxMSI+Q2xpY2sgdG8gdXBsb2FkPC90ZXh0Pgo8L3N2Zz4=" alt="Station Metadata"/>
-      <div class="ss-caption">01 — Station Metadata</div>
-    </div>
-    <div class="ss-item">
-      <img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgOTAwIDU2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBmb250LWZhbWlseT0iJ0lCTSBQbGV4IE1vbm8nLG1vbm9zcGFjZSI+CiAgPHJlY3Qgd2lkdGg9IjkwMCIgaGVpZ2h0PSI1NjAiIGZpbGw9IiMwZDBkMGQiLz4KICA8cmVjdCB3aWR0aD0iOTAwIiBoZWlnaHQ9IjY1IiBmaWxsPSIjMTQxNDE0IiBzdHJva2U9IiMyYTJhMmEiIHN0cm9rZS13aWR0aD0iMSIvPgogIDxyZWN0IHg9IjE4IiB5PSIxNSIgd2lkdGg9IjM0IiBoZWlnaHQ9IjM0IiByeD0iNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNGE5YjdmIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8dGV4dCB4PSIzNSIgeT0iMzYiIGZpbGw9IiM0YTliN2YiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSI2MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlNXPC90ZXh0PgogIDx0ZXh0IHg9IjY2IiB5PSIzNCIgZmlsbD0iI2U4ZTRkYyIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjUwMCIgbGV0dGVyLXNwYWNpbmc9IjEiPlNXSUZUPC90ZXh0PgogIDx0ZXh0IHg9IjY2IiB5PSI0OSIgZmlsbD0iIzZiNmI2YiIgZm9udC1zaXplPSIxMCIgbGV0dGVyLXNwYWNpbmc9IjAuNSI+U1dBVCsgSW5wdXQgRmlsZSBUb29sIMK3IHYxLjA8L3RleHQ+CiAgPHRleHQgeD0iODIwIiB5PSIzNyIgZmlsbD0iIzRhOWI3ZiIgZm9udC1zaXplPSIxMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgbGV0dGVyLXNwYWNpbmc9IjEiPlNXQVQrIFJFQURZPC90ZXh0PgogIDxyZWN0IHg9Ijc3MyIgeT0iMjQiIHdpZHRoPSIxMDgiIGhlaWdodD0iMjAiIHJ4PSIyIiBmaWxsPSJub25lIiBzdHJva2U9IiMzYTZiNWMiIHN0cm9rZS13aWR0aD0iMSIvPgogIDxyZWN0IHg9IjAiIHk9IjY1IiB3aWR0aD0iMjQwIiBoZWlnaHQ9IjQ5NSIgZmlsbD0iIzE0MTQxNCIgc3Ryb2tlPSIjMmEyYTJhIiBzdHJva2Utd2lkdGg9IjAuNSIvPgogIDx0ZXh0IHg9IjE4IiB5PSIxMDAiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iOSIgbGV0dGVyLXNwYWNpbmc9IjIiPklOUFVUUzwvdGV4dD4KICA8dGV4dCB4PSIyOCIgeT0iMTMyIiBmaWxsPSIjNmI2YjZiIiBmb250LXNpemU9IjEwIj4wMTwvdGV4dD4KICA8dGV4dCB4PSI0OCIgeT0iMTMyIiBmaWxsPSIjOWE5YTlhIiBmb250LXNpemU9IjEyIj5TdGF0aW9uIE1ldGFkYXRhPC90ZXh0PgogIDxyZWN0IHg9IjEwIiB5PSIxNDQiIHdpZHRoPSIyMjAiIGhlaWdodD0iMzYiIHJ4PSI0IiBmaWxsPSJyZ2JhKDc0LDE1NSwxMjcsMC4xNSkiIHN0cm9rZT0iIzNhNmI1YyIgc3Ryb2tlLXdpZHRoPSIxIi8+CiAgPHRleHQgeD0iMjgiIHk9IjE2NiIgZmlsbD0iIzRhOWI3ZiIgZm9udC1zaXplPSIxMCI+MDI8L3RleHQ+CiAgPHRleHQgeD0iNDgiIHk9IjE2NiIgZmlsbD0iI2U4ZTRkYyIgZm9udC1zaXplPSIxMiIgZm9udC13ZWlnaHQ9IjUwMCI+UmVxdWlyZWQgV2VhdGhlcjwvdGV4dD4KICA8dGV4dCB4PSIyOCIgeT0iMjA1IiBmaWxsPSIjNmI2YjZiIiBmb250LXNpemU9IjEwIj4wMzwvdGV4dD4KICA8dGV4dCB4PSI0OCIgeT0iMjA1IiBmaWxsPSIjOWE5YTlhIiBmb250LXNpemU9IjEyIj5PcHRpb25hbCBXZWF0aGVyPC90ZXh0PgogIDx0ZXh0IHg9IjE4IiB5PSIyNDAiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iOSIgbGV0dGVyLXNwYWNpbmc9IjIiPlNFVFRJTkdTPC90ZXh0PgogIDx0ZXh0IHg9IjI4IiB5PSIyNjUiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iMTAiPjA0PC90ZXh0PgogIDx0ZXh0IHg9IjQ4IiB5PSIyNjUiIGZpbGw9IiM5YTlhOWEiIGZvbnQtc2l6ZT0iMTIiPlNldHRpbmdzPC90ZXh0PgogIDx0ZXh0IHg9IjE4IiB5PSIzMDAiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iOSIgbGV0dGVyLXNwYWNpbmc9IjIiPk9VVFBVVDwvdGV4dD4KICA8dGV4dCB4PSIyOCIgeT0iMzI1IiBmaWxsPSIjNmI2YjZiIiBmb250LXNpemU9IjEwIj4wNTwvdGV4dD4KICA8dGV4dCB4PSI0OCIgeT0iMzI1IiBmaWxsPSIjOWE5YTlhIiBmb250LXNpemU9IjEyIj5HZW5lcmF0ZSAmYW1wOyBEb3dubG9hZDwvdGV4dD4KICA8IS0tIFBhbmVsIGhlYWRlciBhY2NlbnQgLS0+CiAgPHJlY3QgeD0iMjUzIiB5PSI5NyIgd2lkdGg9IjMiIGhlaWdodD0iMTQiIHJ4PSIyIiBmaWxsPSIjNGE5YjdmIi8+CiAgPHRleHQgeD0iMjY1IiB5PSIxMTAiIGZpbGw9IiNlOGU0ZGMiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSI2MDAiIGxldHRlci1zcGFjaW5nPSIwLjUiPlJlcXVpcmVkIFdlYXRoZXIgRGF0YTwvdGV4dD4KICA8dGV4dCB4PSIyNjUiIHk9IjEzMCIgZmlsbD0iIzZiNmI2YiIgZm9udC1zaXplPSIxMSI+VGhyZWUgQ1NWIGZpbGVzIGluIHRyYW5zcG9zZWQgbXVsdGktc3RhdGlvbiBmb3JtYXQgYXJlIHJlcXVpcmVkLjwvdGV4dD4KICA8cmVjdCB4PSIyNTAiIHk9IjE0NSIgd2lkdGg9IjYyMCIgaGVpZ2h0PSI1MCIgcng9IjQiIGZpbGw9IiMxYzFjMWMiIHN0cm9rZT0iIzJhMmEyYSIvPgogIDxyZWN0IHg9IjI1MCIgeT0iMTQ1IiB3aWR0aD0iMyIgaGVpZ2h0PSI1MCIgcng9IjIiIGZpbGw9IiMzYTZiNWMiLz4KICA8dGV4dCB4PSIyNjgiIHk9IjE2NSIgZmlsbD0iIzlhOWE5YSIgZm9udC1zaXplPSIxMSI+Rm9ybWF0OiByb3dzID0gZGF0ZXMgKFlZWVktTU0tREQpLCBjb2x1bW5zID0gc3RhdGlvbnMgaW4gc2FtZSBvcmRlciBhcyBzdGF0aW9ucyBDU1YuPC90ZXh0PgogIDx0ZXh0IHg9IjI2OCIgeT0iMTgzIiBmaWxsPSIjOWE5YTlhIiBmb250LXNpemU9IjExIj5GaXJzdCAyIHJvd3MgYXJlIGhlYWRlciBpbmZvIGFuZCBhcmUgc2tpcHBlZCBhdXRvbWF0aWNhbGx5LiBWYWx1ZXMgbXVzdCBiZSBudW1lcmljLjwvdGV4dD4KICA8IS0tIFRocmVlIGNhcmRzIC0tPgogIDxyZWN0IHg9IjI1MCIgeT0iMjEyIiB3aWR0aD0iMTkwIiBoZWlnaHQ9IjExMCIgcng9IjYiIGZpbGw9IiMxYzFjMWMiIHN0cm9rZT0iIzJhMmEyYSIvPgogIDx0ZXh0IHg9IjI2OCIgeT0iMjQ4IiBmb250LXNpemU9IjIwIj7wn4yn77iPPC90ZXh0PgogIDx0ZXh0IHg9IjI2OCIgeT0iMjc4IiBmaWxsPSIjZThlNGRjIiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iNTAwIj5QcmVjaXBpdGF0aW9uPC90ZXh0PgogIDxyZWN0IHg9IjM1OCIgeT0iMjY3IiB3aWR0aD0iMjYiIGhlaWdodD0iMTQiIHJ4PSIyIiBmaWxsPSJyZ2JhKDc0LDE1NSwxMjcsMC4xNSkiLz4KICA8dGV4dCB4PSIzNjEiIHk9IjI3NyIgZmlsbD0iIzRhOWI3ZiIgZm9udC1zaXplPSI5Ij5SRVE8L3RleHQ+CiAgPHRleHQgeD0iMjY4IiB5PSIzMDAiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iMTAiPm1tL2RheSDCtyBDbGljayB0byB1cGxvYWQ8L3RleHQ+CiAgPHJlY3QgeD0iNDU1IiB5PSIyMTIiIHdpZHRoPSIxOTAiIGhlaWdodD0iMTEwIiByeD0iNiIgZmlsbD0iIzFjMWMxYyIgc3Ryb2tlPSIjMmEyYTJhIi8+CiAgPHRleHQgeD0iNDczIiB5PSIyNDgiIGZvbnQtc2l6ZT0iMjAiPvCfjKHvuI88L3RleHQ+CiAgPHRleHQgeD0iNDczIiB5PSIyNzgiIGZpbGw9IiNlOGU0ZGMiIGZvbnQtc2l6ZT0iMTEiIGZvbnQtd2VpZ2h0PSI1MDAiPk1heCBUZW1wZXJhdHVyZTwvdGV4dD4KICA8cmVjdCB4PSI1NzEiIHk9IjI2NyIgd2lkdGg9IjI2IiBoZWlnaHQ9IjE0IiByeD0iMiIgZmlsbD0icmdiYSg3NCwxNTUsMTI3LDAuMTUpIi8+CiAgPHRleHQgeD0iNTc0IiB5PSIyNzciIGZpbGw9IiM0YTliN2YiIGZvbnQtc2l6ZT0iOSI+UkVRPC90ZXh0PgogIDx0ZXh0IHg9IjQ3MyIgeT0iMzAwIiBmaWxsPSIjNmI2YjZiIiBmb250LXNpemU9IjEwIj7CsEMgwrcgQ2xpY2sgdG8gdXBsb2FkPC90ZXh0PgogIDxyZWN0IHg9IjY2MCIgeT0iMjEyIiB3aWR0aD0iMjEwIiBoZWlnaHQ9IjExMCIgcng9IjYiIGZpbGw9IiMxYzFjMWMiIHN0cm9rZT0iIzJhMmEyYSIvPgogIDx0ZXh0IHg9IjY3OCIgeT0iMjQ4IiBmb250LXNpemU9IjIwIj7inYTvuI88L3RleHQ+CiAgPHRleHQgeD0iNjc4IiB5PSIyNzgiIGZpbGw9IiNlOGU0ZGMiIGZvbnQtc2l6ZT0iMTEiIGZvbnQtd2VpZ2h0PSI1MDAiPk1pbiBUZW1wZXJhdHVyZTwvdGV4dD4KICA8cmVjdCB4PSI3NzEiIHk9IjI2NyIgd2lkdGg9IjI2IiBoZWlnaHQ9IjE0IiByeD0iMiIgZmlsbD0icmdiYSg3NCwxNTUsMTI3LDAuMTUpIi8+CiAgPHRleHQgeD0iNzc0IiB5PSIyNzciIGZpbGw9IiM0YTliN2YiIGZvbnQtc2l6ZT0iOSI+UkVRPC90ZXh0PgogIDx0ZXh0IHg9IjY3OCIgeT0iMzAwIiBmaWxsPSIjNmI2YjZiIiBmb250LXNpemU9IjEwIj7CsEMgwrcgQ2xpY2sgdG8gdXBsb2FkPC90ZXh0Pgo8L3N2Zz4=" alt="Required Weather"/>
-      <div class="ss-caption">02 — Required Weather Data</div>
-    </div>
-    <div class="ss-item">
-      <img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgOTAwIDU2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBmb250LWZhbWlseT0iJ0lCTSBQbGV4IE1vbm8nLG1vbm9zcGFjZSI+CiAgPHJlY3Qgd2lkdGg9IjkwMCIgaGVpZ2h0PSI1NjAiIGZpbGw9IiMwZDBkMGQiLz4KICA8cmVjdCB3aWR0aD0iOTAwIiBoZWlnaHQ9IjY1IiBmaWxsPSIjMTQxNDE0IiBzdHJva2U9IiMyYTJhMmEiIHN0cm9rZS13aWR0aD0iMSIvPgogIDxyZWN0IHg9IjE4IiB5PSIxNSIgd2lkdGg9IjM0IiBoZWlnaHQ9IjM0IiByeD0iNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNGE5YjdmIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8dGV4dCB4PSIzNSIgeT0iMzYiIGZpbGw9IiM0YTliN2YiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSI2MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlNXPC90ZXh0PgogIDx0ZXh0IHg9IjY2IiB5PSIzNCIgZmlsbD0iI2U4ZTRkYyIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjUwMCIgbGV0dGVyLXNwYWNpbmc9IjEiPlNXSUZUPC90ZXh0PgogIDx0ZXh0IHg9IjY2IiB5PSI0OSIgZmlsbD0iIzZiNmI2YiIgZm9udC1zaXplPSIxMCIgbGV0dGVyLXNwYWNpbmc9IjAuNSI+U1dBVCsgSW5wdXQgRmlsZSBUb29sIMK3IHYxLjA8L3RleHQ+CiAgPHRleHQgeD0iODIwIiB5PSIzNyIgZmlsbD0iIzRhOWI3ZiIgZm9udC1zaXplPSIxMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgbGV0dGVyLXNwYWNpbmc9IjEiPlNXQVQrIFJFQURZPC90ZXh0PgogIDxyZWN0IHg9Ijc3MyIgeT0iMjQiIHdpZHRoPSIxMDgiIGhlaWdodD0iMjAiIHJ4PSIyIiBmaWxsPSJub25lIiBzdHJva2U9IiMzYTZiNWMiIHN0cm9rZS13aWR0aD0iMSIvPgogIDxyZWN0IHg9IjAiIHk9IjY1IiB3aWR0aD0iMjQwIiBoZWlnaHQ9IjQ5NSIgZmlsbD0iIzE0MTQxNCIgc3Ryb2tlPSIjMmEyYTJhIiBzdHJva2Utd2lkdGg9IjAuNSIvPgogIDx0ZXh0IHg9IjE4IiB5PSIxMDAiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iOSIgbGV0dGVyLXNwYWNpbmc9IjIiPklOUFVUUzwvdGV4dD4KICA8dGV4dCB4PSIyOCIgeT0iMTMyIiBmaWxsPSIjNmI2YjZiIiBmb250LXNpemU9IjEwIj4wMTwvdGV4dD48dGV4dCB4PSI0OCIgeT0iMTMyIiBmaWxsPSIjOWE5YTlhIiBmb250LXNpemU9IjEyIj5TdGF0aW9uIE1ldGFkYXRhPC90ZXh0PgogIDx0ZXh0IHg9IjI4IiB5PSIxNjgiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iMTAiPjAyPC90ZXh0Pjx0ZXh0IHg9IjQ4IiB5PSIxNjgiIGZpbGw9IiM5YTlhOWEiIGZvbnQtc2l6ZT0iMTIiPlJlcXVpcmVkIFdlYXRoZXI8L3RleHQ+CiAgPHJlY3QgeD0iMTAiIHk9IjE4MCIgd2lkdGg9IjIyMCIgaGVpZ2h0PSIzNiIgcng9IjQiIGZpbGw9InJnYmEoNzQsMTU1LDEyNywwLjE1KSIgc3Ryb2tlPSIjM2E2YjVjIiBzdHJva2Utd2lkdGg9IjEiLz4KICA8dGV4dCB4PSIyOCIgeT0iMjAyIiBmaWxsPSIjNGE5YjdmIiBmb250LXNpemU9IjEwIj4wMzwvdGV4dD48dGV4dCB4PSI0OCIgeT0iMjAyIiBmaWxsPSIjZThlNGRjIiBmb250LXNpemU9IjEyIiBmb250LXdlaWdodD0iNTAwIj5PcHRpb25hbCBXZWF0aGVyPC90ZXh0PgogIDx0ZXh0IHg9IjE4IiB5PSIyNDAiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iOSIgbGV0dGVyLXNwYWNpbmc9IjIiPlNFVFRJTkdTPC90ZXh0PgogIDx0ZXh0IHg9IjI4IiB5PSIyNjUiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iMTAiPjA0PC90ZXh0Pjx0ZXh0IHg9IjQ4IiB5PSIyNjUiIGZpbGw9IiM5YTlhOWEiIGZvbnQtc2l6ZT0iMTIiPlNldHRpbmdzPC90ZXh0PgogIDx0ZXh0IHg9IjE4IiB5PSIzMDAiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iOSIgbGV0dGVyLXNwYWNpbmc9IjIiPk9VVFBVVDwvdGV4dD4KICA8dGV4dCB4PSIyOCIgeT0iMzI1IiBmaWxsPSIjNmI2YjZiIiBmb250LXNpemU9IjEwIj4wNTwvdGV4dD48dGV4dCB4PSI0OCIgeT0iMzI1IiBmaWxsPSIjOWE5YTlhIiBmb250LXNpemU9IjEyIj5HZW5lcmF0ZSAmYW1wOyBEb3dubG9hZDwvdGV4dD4KICA8cmVjdCB4PSIyNTMiIHk9Ijk3IiB3aWR0aD0iMyIgaGVpZ2h0PSIxNCIgcng9IjIiIGZpbGw9IiM0YTliN2YiLz4KICA8dGV4dCB4PSIyNjUiIHk9IjExMCIgZmlsbD0iI2U4ZTRkYyIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjYwMCIgbGV0dGVyLXNwYWNpbmc9IjAuNSI+T3B0aW9uYWwgV2VhdGhlciBEYXRhPC90ZXh0PgogIDx0ZXh0IHg9IjI2NSIgeT0iMTMwIiBmaWxsPSIjNmI2YjZiIiBmb250LXNpemU9IjExIj5UaGVzZSBpbnB1dHMgZW5hYmxlIGFkZGl0aW9uYWwgb3V0cHV0IGZpbGVzLiBJZiBub3QgcHJvdmlkZWQsIHZhbHVlcyBhcmUgZXN0aW1hdGVkLjwvdGV4dD4KICA8cmVjdCB4PSIyNTAiIHk9IjE1NSIgd2lkdGg9IjE5MCIgaGVpZ2h0PSIxMTAiIHJ4PSI2IiBmaWxsPSIjMWMxYzFjIiBzdHJva2U9IiMyYTJhMmEiLz4KICA8dGV4dCB4PSIyNjgiIHk9IjE5MSIgZm9udC1zaXplPSIyMCI+4piA77iPPC90ZXh0PgogIDx0ZXh0IHg9IjI2OCIgeT0iMjIxIiBmaWxsPSIjZThlNGRjIiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iNTAwIj5Tb2xhciBSYWRpYXRpb248L3RleHQ+CiAgPHJlY3QgeD0iMzYwIiB5PSIyMTAiIHdpZHRoPSIyNiIgaGVpZ2h0PSIxNCIgcng9IjIiIGZpbGw9IiMxYzFjMWMiIHN0cm9rZT0iIzJhMmEyYSIvPgogIDx0ZXh0IHg9IjM2NCIgeT0iMjIwIiBmaWxsPSIjNmI2YjZiIiBmb250LXNpemU9IjkiPk9QVDwvdGV4dD4KICA8dGV4dCB4PSIyNjgiIHk9IjI0MyIgZmlsbD0iIzZiNmI2YiIgZm9udC1zaXplPSIxMCI+TUovbcKyL2RheSDCtyBDbGljayB0byB1cGxvYWQ8L3RleHQ+CiAgPHJlY3QgeD0iNDU1IiB5PSIxNTUiIHdpZHRoPSIxOTAiIGhlaWdodD0iMTEwIiByeD0iNiIgZmlsbD0iIzFjMWMxYyIgc3Ryb2tlPSIjMmEyYTJhIi8+CiAgPHRleHQgeD0iNDczIiB5PSIxOTEiIGZvbnQtc2l6ZT0iMjAiPvCfkqc8L3RleHQ+CiAgPHRleHQgeD0iNDczIiB5PSIyMjEiIGZpbGw9IiNlOGU0ZGMiIGZvbnQtc2l6ZT0iMTEiIGZvbnQtd2VpZ2h0PSI1MDAiPkh1bWlkaXR5IC8gRGV3cG9pbnQ8L3RleHQ+CiAgPHJlY3QgeD0iNTc1IiB5PSIyMTAiIHdpZHRoPSIyNiIgaGVpZ2h0PSIxNCIgcng9IjIiIGZpbGw9IiMxYzFjMWMiIHN0cm9rZT0iIzJhMmEyYSIvPgogIDx0ZXh0IHg9IjU3OSIgeT0iMjIwIiBmaWxsPSIjNmI2YjZiIiBmb250LXNpemU9IjkiPk9QVDwvdGV4dD4KICA8dGV4dCB4PSI0NzMiIHk9IjI0MyIgZmlsbD0iIzZiNmI2YiIgZm9udC1zaXplPSIxMCI+Q2xpY2sgdG8gdXBsb2FkPC90ZXh0PgogIDxyZWN0IHg9IjY2MCIgeT0iMTU1IiB3aWR0aD0iMjEwIiBoZWlnaHQ9IjExMCIgcng9IjYiIGZpbGw9IiMxYzFjMWMiIHN0cm9rZT0iIzJhMmEyYSIvPgogIDx0ZXh0IHg9IjY3OCIgeT0iMTkxIiBmb250LXNpemU9IjIwIj7wn5KoPC90ZXh0PgogIDx0ZXh0IHg9IjY3OCIgeT0iMjIxIiBmaWxsPSIjZThlNGRjIiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iNTAwIj5XaW5kIFNwZWVkPC90ZXh0PgogIDxyZWN0IHg9Ijc1MSIgeT0iMjEwIiB3aWR0aD0iMjYiIGhlaWdodD0iMTQiIHJ4PSIyIiBmaWxsPSIjMWMxYzFjIiBzdHJva2U9IiMyYTJhMmEiLz4KICA8dGV4dCB4PSI3NTUiIHk9IjIyMCIgZmlsbD0iIzZiNmI2YiIgZm9udC1zaXplPSI5Ij5PUFQ8L3RleHQ+CiAgPHRleHQgeD0iNjc4IiB5PSIyNDMiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iMTAiPm0vcyDCtyBDbGljayB0byB1cGxvYWQ8L3RleHQ+Cjwvc3ZnPg==" alt="Optional Weather"/>
-      <div class="ss-caption">03 — Optional Weather Data</div>
-    </div>
-    <div class="ss-item">
-      <img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgOTAwIDU2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBmb250LWZhbWlseT0iJ0lCTSBQbGV4IE1vbm8nLG1vbm9zcGFjZSI+CiAgPHJlY3Qgd2lkdGg9IjkwMCIgaGVpZ2h0PSI1NjAiIGZpbGw9IiMwZDBkMGQiLz4KICA8cmVjdCB3aWR0aD0iOTAwIiBoZWlnaHQ9IjY1IiBmaWxsPSIjMTQxNDE0IiBzdHJva2U9IiMyYTJhMmEiIHN0cm9rZS13aWR0aD0iMSIvPgogIDxyZWN0IHg9IjE4IiB5PSIxNSIgd2lkdGg9IjM0IiBoZWlnaHQ9IjM0IiByeD0iNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNGE5YjdmIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8dGV4dCB4PSIzNSIgeT0iMzYiIGZpbGw9IiM0YTliN2YiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSI2MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlNXPC90ZXh0PgogIDx0ZXh0IHg9IjY2IiB5PSIzNCIgZmlsbD0iI2U4ZTRkYyIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjUwMCIgbGV0dGVyLXNwYWNpbmc9IjEiPlNXSUZUPC90ZXh0PgogIDx0ZXh0IHg9IjY2IiB5PSI0OSIgZmlsbD0iIzZiNmI2YiIgZm9udC1zaXplPSIxMCIgbGV0dGVyLXNwYWNpbmc9IjAuNSI+U1dBVCsgSW5wdXQgRmlsZSBUb29sIMK3IHYxLjA8L3RleHQ+CiAgPHRleHQgeD0iODIwIiB5PSIzNyIgZmlsbD0iIzRhOWI3ZiIgZm9udC1zaXplPSIxMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgbGV0dGVyLXNwYWNpbmc9IjEiPlNXQVQrIFJFQURZPC90ZXh0PgogIDxyZWN0IHg9Ijc3MyIgeT0iMjQiIHdpZHRoPSIxMDgiIGhlaWdodD0iMjAiIHJ4PSIyIiBmaWxsPSJub25lIiBzdHJva2U9IiMzYTZiNWMiIHN0cm9rZS13aWR0aD0iMSIvPgogIDxyZWN0IHg9IjAiIHk9IjY1IiB3aWR0aD0iMjQwIiBoZWlnaHQ9IjQ5NSIgZmlsbD0iIzE0MTQxNCIgc3Ryb2tlPSIjMmEyYTJhIiBzdHJva2Utd2lkdGg9IjAuNSIvPgogIDx0ZXh0IHg9IjE4IiB5PSIxMDAiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iOSIgbGV0dGVyLXNwYWNpbmc9IjIiPklOUFVUUzwvdGV4dD4KICA8dGV4dCB4PSIyOCIgeT0iMTMyIiBmaWxsPSIjNmI2YjZiIiBmb250LXNpemU9IjEwIj4wMTwvdGV4dD48dGV4dCB4PSI0OCIgeT0iMTMyIiBmaWxsPSIjOWE5YTlhIiBmb250LXNpemU9IjEyIj5TdGF0aW9uIE1ldGFkYXRhPC90ZXh0PgogIDx0ZXh0IHg9IjI4IiB5PSIxNjgiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iMTAiPjAyPC90ZXh0Pjx0ZXh0IHg9IjQ4IiB5PSIxNjgiIGZpbGw9IiM5YTlhOWEiIGZvbnQtc2l6ZT0iMTIiPlJlcXVpcmVkIFdlYXRoZXI8L3RleHQ+CiAgPHRleHQgeD0iMjgiIHk9IjIwNCIgZmlsbD0iIzZiNmI2YiIgZm9udC1zaXplPSIxMCI+MDM8L3RleHQ+PHRleHQgeD0iNDgiIHk9IjIwNCIgZmlsbD0iIzlhOWE5YSIgZm9udC1zaXplPSIxMiI+T3B0aW9uYWwgV2VhdGhlcjwvdGV4dD4KICA8dGV4dCB4PSIxOCIgeT0iMjQwIiBmaWxsPSIjNmI2YjZiIiBmb250LXNpemU9IjkiIGxldHRlci1zcGFjaW5nPSIyIj5TRVRUSU5HUzwvdGV4dD4KICA8cmVjdCB4PSIxMCIgeT0iMjQ4IiB3aWR0aD0iMjIwIiBoZWlnaHQ9IjM2IiByeD0iNCIgZmlsbD0icmdiYSg3NCwxNTUsMTI3LDAuMTUpIiBzdHJva2U9IiMzYTZiNWMiIHN0cm9rZS13aWR0aD0iMSIvPgogIDx0ZXh0IHg9IjI4IiB5PSIyNzAiIGZpbGw9IiM0YTliN2YiIGZvbnQtc2l6ZT0iMTAiPjA0PC90ZXh0Pjx0ZXh0IHg9IjQ4IiB5PSIyNzAiIGZpbGw9IiNlOGU0ZGMiIGZvbnQtc2l6ZT0iMTIiIGZvbnQtd2VpZ2h0PSI1MDAiPlNldHRpbmdzPC90ZXh0PgogIDx0ZXh0IHg9IjE4IiB5PSIzMTAiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iOSIgbGV0dGVyLXNwYWNpbmc9IjIiPk9VVFBVVDwvdGV4dD4KICA8dGV4dCB4PSIyOCIgeT0iMzM1IiBmaWxsPSIjNmI2YjZiIiBmb250LXNpemU9IjEwIj4wNTwvdGV4dD48dGV4dCB4PSI0OCIgeT0iMzM1IiBmaWxsPSIjOWE5YTlhIiBmb250LXNpemU9IjEyIj5HZW5lcmF0ZSAmYW1wOyBEb3dubG9hZDwvdGV4dD4KICA8cmVjdCB4PSIyNTMiIHk9Ijk3IiB3aWR0aD0iMyIgaGVpZ2h0PSIxNCIgcng9IjIiIGZpbGw9IiM0YTliN2YiLz4KICA8dGV4dCB4PSIyNjUiIHk9IjExMCIgZmlsbD0iI2U4ZTRkYyIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjYwMCIgbGV0dGVyLXNwYWNpbmc9IjAuNSI+U2V0dGluZ3M8L3RleHQ+CiAgPHRleHQgeD0iMjY1IiB5PSIxMzAiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iMTEiPkNvbmZpZ3VyZSBvdXRwdXQgb3B0aW9ucyBiZWZvcmUgZ2VuZXJhdGluZyBmaWxlcy4gRGF0YSB3aWxsIGJlIHNsaWNlZCB0byB0aGlzIHBlcmlvZC48L3RleHQ+CiAgPHRleHQgeD0iMjY1IiB5PSIxNjIiIGZpbGw9IiM5YTlhOWEiIGZvbnQtc2l6ZT0iMTEiPlN0YXJ0IGRhdGU8L3RleHQ+CiAgPHJlY3QgeD0iMjY1IiB5PSIxNzAiIHdpZHRoPSI0MDAiIGhlaWdodD0iMzIiIHJ4PSI0IiBmaWxsPSIjZjRmNGYwIiBzdHJva2U9IiNkNGQ0ZDQiLz4KICA8dGV4dCB4PSIyNzgiIHk9IjE5MSIgZmlsbD0iIzg4OCIgZm9udC1zaXplPSIxMiI+ZGQtbW0teXl5eTwvdGV4dD4KICA8dGV4dCB4PSIyNjUiIHk9IjIyMiIgZmlsbD0iIzlhOWE5YSIgZm9udC1zaXplPSIxMSI+RW5kIGRhdGU8L3RleHQ+CiAgPHJlY3QgeD0iMjY1IiB5PSIyMzAiIHdpZHRoPSI0MDAiIGhlaWdodD0iMzIiIHJ4PSI0IiBmaWxsPSIjZjRmNGYwIiBzdHJva2U9IiNkNGQ0ZDQiLz4KICA8dGV4dCB4PSIyNzgiIHk9IjI1MSIgZmlsbD0iIzg4OCIgZm9udC1zaXplPSIxMiI+ZGQtbW0teXl5eTwvdGV4dD4KICA8dGV4dCB4PSIyNjUiIHk9IjI4NCIgZmlsbD0iIzlhOWE5YSIgZm9udC1zaXplPSIxMSI+T3V0cHV0IGRpcmVjdG9yeTwvdGV4dD4KICA8cmVjdCB4PSIyNjUiIHk9IjI5MiIgd2lkdGg9IjE4MCIgaGVpZ2h0PSIzMiIgcng9IjQiIGZpbGw9IiMxYzFjMWMiIHN0cm9rZT0iIzJhMmEyYSIvPgogIDx0ZXh0IHg9IjI4NSIgeT0iMzEzIiBmaWxsPSIjZThlNGRjIiBmb250LXNpemU9IjExIj5TZWxlY3QgRm9sZGVyLi4uPC90ZXh0PgogIDx0ZXh0IHg9IjI2NSIgeT0iMzQ2IiBmaWxsPSIjOWE5YTlhIiBmb250LXNpemU9IjExIj5FdmFwb3RyYW5zcGlyYXRpb24gKEVUKSBNZXRob2Q8L3RleHQ+CiAgPHJlY3QgeD0iMjY1IiB5PSIzNTYiIHdpZHRoPSIzMTAiIGhlaWdodD0iMzIiIHJ4PSI0IiBmaWxsPSJyZ2JhKDc0LDE1NSwxMjcsMC4xNSkiIHN0cm9rZT0iIzRhOWI3ZiIvPgogIDx0ZXh0IHg9IjI4NSIgeT0iMzc3IiBmaWxsPSIjZThlNGRjIiBmb250LXNpemU9IjExIj5IYXJncmVhdmVzLVNhbWFuaSAocmVxdWlyZXMgVGVtcGVyYXR1cmUpPC90ZXh0PgogIDxyZWN0IHg9IjI2NSIgeT0iMzk2IiB3aWR0aD0iMzQwIiBoZWlnaHQ9IjMyIiByeD0iNCIgZmlsbD0iIzFjMWMxYyIgc3Ryb2tlPSIjMmEyYTJhIi8+CiAgPHRleHQgeD0iMjg1IiB5PSI0MTciIGZpbGw9IiM5YTlhOWEiIGZvbnQtc2l6ZT0iMTEiPkZBTy01NiBQZW5tYW4tTW9udGVpdGggKHJlcXVpcmVzIFNvbGFyLCBIdW1pZGl0eSwgV2luZCk8L3RleHQ+Cjwvc3ZnPg==" alt="Settings"/>
-      <div class="ss-caption">04 — Settings &amp; ET Method</div>
-    </div>
-    <div class="ss-item">
-      <img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgOTAwIDU2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBmb250LWZhbWlseT0iJ0lCTSBQbGV4IE1vbm8nLG1vbm9zcGFjZSI+CiAgPHJlY3Qgd2lkdGg9IjkwMCIgaGVpZ2h0PSI1NjAiIGZpbGw9IiMwZDBkMGQiIG9wYWNpdHk9IjAuNSIvPgogIDxyZWN0IHdpZHRoPSI5MDAiIGhlaWdodD0iNTYwIiBmaWxsPSJyZ2JhKDAsMCwwLDAuNykiLz4KICA8IS0tIE1vZGFsIC0tPgogIDxyZWN0IHg9IjIyMCIgeT0iMTMwIiB3aWR0aD0iNDYwIiBoZWlnaHQ9IjMyMCIgcng9IjgiIGZpbGw9IiMxNDE0MTQiIHN0cm9rZT0iIzJhMmEyYSIgc3Ryb2tlLXdpZHRoPSIxIi8+CiAgPHRleHQgeD0iMjQ4IiB5PSIxNzAiIGZvbnQtc2l6ZT0iMTYiPvCfjJA8L3RleHQ+CiAgPHRleHQgeD0iMjcyIiB5PSIxNzIiIGZpbGw9IiNlOGU0ZGMiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSI2MDAiIGxldHRlci1zcGFjaW5nPSIwLjUiPk1pc3NpbmcgT3B0aW9uYWwgVmFyaWFibGVzPC90ZXh0PgogIDx0ZXh0IHg9IjI0MCIgeT0iMTk4IiBmaWxsPSIjNmI2YjZiIiBmb250LXNpemU9IjExIj5Tb21lIG9wdGlvbmFsIGRhdGEgZmlsZXMgd2VyZSBub3QgdXBsb2FkZWQuPC90ZXh0PgogIDx0ZXh0IHg9IjI0MCIgeT0iMjE0IiBmaWxsPSIjNmI2YjZiIiBmb250LXNpemU9IjExIj5DaG9vc2UgaG93IHRvIGhhbmRsZSBlYWNoIG1pc3NpbmcgdmFyaWFibGU6PC90ZXh0PgogIDwhLS0gU29sYXIgcm93IC0tPgogIDx0ZXh0IHg9IjI0MCIgeT0iMjUwIiBmaWxsPSIjOWE5YTlhIiBmb250LXNpemU9IjEyIj5Tb2xhciBSYWRpYXRpb248L3RleHQ+CiAgPHJlY3QgeD0iNDIwIiB5PSIyMzQiIHdpZHRoPSIxMTAiIGhlaWdodD0iMjYiIHJ4PSI0IiBmaWxsPSIjMWMxYzFjIiBzdHJva2U9IiMyYTJhMmEiLz4KICA8dGV4dCB4PSI0NTIiIHk9IjI1MSIgZmlsbD0iIzlhOWE5YSIgZm9udC1zaXplPSIxMSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+RmV0Y2ggTkFTQSBQT1dFUjwvdGV4dD4KICA8cmVjdCB4PSI1NDAiIHk9IjIzNCIgd2lkdGg9IjExMCIgaGVpZ2h0PSIyNiIgcng9IjQiIGZpbGw9InJnYmEoNzQsMTU1LDEyNywwLjE1KSIgc3Ryb2tlPSIjNGE5YjdmIi8+CiAgPHRleHQgeD0iNTk1IiB5PSIyNTEiIGZpbGw9IiM0YTliN2YiIGZvbnQtc2l6ZT0iMTEiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkZBTy01NiBlc3RpbWF0ZTwvdGV4dD4KICA8IS0tIEh1bWlkaXR5IHJvdyAtLT4KICA8dGV4dCB4PSIyNDAiIHk9IjI5NiIgZmlsbD0iIzlhOWE5YSIgZm9udC1zaXplPSIxMiI+SHVtaWRpdHkgLyBEZXdwb2ludDwvdGV4dD4KICA8cmVjdCB4PSI0MjAiIHk9IjI4MCIgd2lkdGg9IjExMCIgaGVpZ2h0PSIyNiIgcng9IjQiIGZpbGw9IiMxYzFjMWMiIHN0cm9rZT0iIzJhMmEyYSIvPgogIDx0ZXh0IHg9IjQ1MiIgeT0iMjk3IiBmaWxsPSIjOWE5YTlhIiBmb250LXNpemU9IjExIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5GZXRjaCBOQVNBIFBPV0VSPC90ZXh0PgogIDxyZWN0IHg9IjU0MCIgeT0iMjgwIiB3aWR0aD0iMTEwIiBoZWlnaHQ9IjI2IiByeD0iNCIgZmlsbD0icmdiYSg3NCwxNTUsMTI3LDAuMTUpIiBzdHJva2U9IiM0YTliN2YiLz4KICA8dGV4dCB4PSI1OTUiIHk9IjI5NyIgZmlsbD0iIzRhOWI3ZiIgZm9udC1zaXplPSIxMSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+U2tpcDwvdGV4dD4KICA8IS0tIFdpbmQgcm93IC0tPgogIDx0ZXh0IHg9IjI0MCIgeT0iMzQyIiBmaWxsPSIjOWE5YTlhIiBmb250LXNpemU9IjEyIj5XaW5kIFNwZWVkPC90ZXh0PgogIDxyZWN0IHg9IjQyMCIgeT0iMzI2IiB3aWR0aD0iMTEwIiBoZWlnaHQ9IjI2IiByeD0iNCIgZmlsbD0iIzFjMWMxYyIgc3Ryb2tlPSIjMmEyYTJhIi8+CiAgPHRleHQgeD0iNDUyIiB5PSIzNDMiIGZpbGw9IiM5YTlhOWEiIGZvbnQtc2l6ZT0iMTEiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkZldGNoIE5BU0EgUE9XRVI8L3RleHQ+CiAgPHJlY3QgeD0iNTQwIiB5PSIzMjYiIHdpZHRoPSIxMTAiIGhlaWdodD0iMjYiIHJ4PSI0IiBmaWxsPSJyZ2JhKDc0LDE1NSwxMjcsMC4xNSkiIHN0cm9rZT0iIzRhOWI3ZiIvPgogIDx0ZXh0IHg9IjU5NSIgeT0iMzQzIiBmaWxsPSIjNGE5YjdmIiBmb250LXNpemU9IjExIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5Ta2lwPC90ZXh0PgogIDwhLS0gQnV0dG9ucyAtLT4KICA8cmVjdCB4PSIzNDAiIHk9IjM4MiIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIzNCIgcng9IjQiIGZpbGw9IiMxYzFjMWMiIHN0cm9rZT0iIzJhMmEyYSIvPgogIDx0ZXh0IHg9IjM5MCIgeT0iNDA0IiBmaWxsPSIjOWE5YTlhIiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5DYW5jZWw8L3RleHQ+CiAgPHJlY3QgeD0iNDU1IiB5PSIzODIiIHdpZHRoPSIxMjAiIGhlaWdodD0iMzQiIHJ4PSI0IiBmaWxsPSIjNGE5YjdmIi8+CiAgPHRleHQgeD0iNTE1IiB5PSI0MDQiIGZpbGw9IiMwZDBkMGQiIGZvbnQtc2l6ZT0iMTIiIGZvbnQtd2VpZ2h0PSI2MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkNvbnRpbnVlPC90ZXh0Pgo8L3N2Zz4=" alt="Missing Variables"/>
-      <div class="ss-caption">05 — Smart Data Source Resolution</div>
-    </div>
-  </div>
-  <div class="ss-dots" id="ssDots">
-    <button class="ss-dot active" data-idx="0"></button>
-    <button class="ss-dot" data-idx="1"></button>
-    <button class="ss-dot" data-idx="2"></button>
-    <button class="ss-dot" data-idx="3"></button>
-    <button class="ss-dot" data-idx="4"></button>
-  </div>
-</div>
-
-<!-- FEATURES -->
-<section id="features">
-  <div class="container">
-    <div class="reveal">
-      <p class="s-label">Capabilities</p>
-      <h2 class="s-title">Everything SWAT+ needs.<br/>Nothing extra.</h2>
-      <p class="s-body">SWIFT handles the tedious parts of SWAT+ model preparation — file formatting, statistics computation, and data gap-filling — so you can focus on modelling.</p>
-    </div>
-    <div class="features-grid reveal">
-      <div class="feat-card">
-        <div class="feat-icon">🌧️</div>
-        <div class="feat-name">Multi-station Support</div>
-        <div class="feat-desc">Processes any number of weather stations from transposed multi-station CSVs. Station names become filenames automatically.</div>
+  <!-- NAV -->
+  <nav>
+    <a class="nav-logo" href="#">
+      <div class="logo-mark">SW</div>
+      <div>
+        <div class="nav-wordmark">SWIFT</div>
+        <div class="nav-sub">SWAT+ Input File Tool</div>
       </div>
-      <div class="feat-card">
-        <div class="feat-icon">📊</div>
-        <div class="feat-name">Full Statistics Engine</div>
-        <div class="feat-desc">Computes all SWAT+ weather generator statistics — wet/dry probabilities, precipitation skew, temperature means and SDs — by station and month.</div>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon">🛰️</div>
-        <div class="feat-name">NASA POWER Integration</div>
-        <div class="feat-desc">Automatically fetches missing solar radiation, wind speed, or humidity from NASA POWER with parallel requests and in-session caching.</div>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon">🏔️</div>
-        <div class="feat-name">Auto Elevation Fill</div>
-        <div class="feat-desc">Missing station elevations are retrieved from OpenTopoData (SRTM 30m / ASTER 30m) — no manual DEM lookup needed.</div>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon">🌿</div>
-        <div class="feat-name">Two ET Methods</div>
-        <div class="feat-desc">Hargreaves-Samani (temperature only) or FAO-56 Penman-Monteith (full data). Choose what your data supports.</div>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon">⚡</div>
-        <div class="feat-name">Works Offline</div>
-        <div class="feat-desc">All core processing is local. API calls are optional — SWIFT gracefully estimates solar radiation via FAO-56 when offline.</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- HOW IT WORKS -->
-<section id="how">
-  <div class="container">
-    <div class="reveal">
-      <p class="s-label">Workflow</p>
-      <h2 class="s-title">Three steps to<br/>SWAT+ ready files.</h2>
-    </div>
-    <div class="steps reveal">
-      <div class="step">
-        <div class="step-num">01</div>
-        <div class="step-title">Upload your data</div>
-        <div class="step-desc">Provide a stations metadata CSV and transposed multi-station CSVs for precipitation, Tmax, and Tmin. Solar, humidity, and wind are optional.</div>
-      </div>
-      <div class="step">
-        <div class="step-num">02</div>
-        <div class="step-title">Configure settings</div>
-        <div class="step-desc">Set your simulation date range, choose an ET method, select your output folder. SWIFT resolves missing variables via NASA POWER or FAO-56.</div>
-      </div>
-      <div class="step">
-        <div class="step-num">03</div>
-        <div class="step-title">Generate &amp; use</div>
-        <div class="step-desc">Click Generate. All .pcp, .tmp, .slr, .hmd, .wnd, .pet files and monthly.csv are written directly to your SWAT+ project folder.</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- OUTPUTS -->
-<section id="outputs">
-  <div class="container">
-    <div class="reveal">
-      <p class="s-label">Output Files</p>
-      <h2 class="s-title">All files SWAT+ expects.<br/>Ready to load.</h2>
-      <p class="s-body">The complete set of SWAT+ weather inputs, formatted to specification and written directly to your project folder.</p>
-    </div>
-    <div class="outputs-grid reveal">
-      <div class="out-row"><span class="out-ext">.pcp</span><div><div class="out-name">Precipitation</div><div class="out-desc">Daily rainfall per station with header metadata</div></div></div>
-      <div class="out-row"><span class="out-ext">.tmp</span><div><div class="out-name">Temperature</div><div class="out-desc">Daily Tmax and Tmin per station</div></div></div>
-      <div class="out-row"><span class="out-ext">.slr</span><div><div class="out-name">Solar Radiation</div><div class="out-desc">From CSV, NASA POWER, or FAO-56 estimate</div></div></div>
-      <div class="out-row"><span class="out-ext">.hmd</span><div><div class="out-name">Humidity</div><div class="out-desc">Daily dewpoint — from RH%, dewpoint CSV, or NASA POWER</div></div></div>
-      <div class="out-row"><span class="out-ext">.wnd</span><div><div class="out-name">Wind Speed</div><div class="out-desc">Daily wind in m/s — from CSV or NASA POWER</div></div></div>
-      <div class="out-row"><span class="out-ext">.pet</span><div><div class="out-name">Potential ET</div><div class="out-desc">Daily ET₀ via Hargreaves-Samani or Penman-Monteith</div></div></div>
-      <div class="out-row"><span class="out-ext">.cli</span><div><div class="out-name">Climate Index Files</div><div class="out-desc">Auto-generated index files for each variable type</div></div></div>
-      <div class="out-row"><span class="out-ext">monthly.csv</span><div><div class="out-name">Weather Generator Stats</div><div class="out-desc">Complete monthly statistics table for SWAT+ wgn</div></div></div>
-      <div class="out-row"><span class="out-ext">stations.csv</span><div><div class="out-name">Updated Station Metadata</div><div class="out-desc">Elevation auto-filled + number of rain years computed</div></div></div>
-    </div>
-  </div>
-</section>
-
-<!-- CITE -->
-<section id="cite">
-  <div class="container">
-    <div class="reveal">
-      <p class="s-label">Citation</p>
-      <h2 class="s-title">If SWIFT helped<br/>your research, cite it.</h2>
-      <p class="s-body">SWIFT has a permanent Zenodo DOI — citable in journal papers, theses, and reports.</p>
-    </div>
-    <div class="cite-box reveal">
-      <div class="cite-header">
-        <span>APA Format</span>
-        <button class="copy-btn" onclick="copyCite()">Copy</button>
-      </div>
-      <div class="cite-body" id="citeText">J, A.K. and Elangovan, A. (2026) "<span class="cite-key">SWIFT: SWAT+ Input File Tool</span>". Zenodo. doi:10.5281/zenodo.19402122.</div>
-    </div>
-    <a class="doi-badge reveal" href="https://doi.org/10.5281/zenodo.19402122" target="_blank">
-      🔗 &nbsp;DOI: 10.5281/zenodo.19402122
     </a>
-  </div>
-</section>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#how">Workflow</a></li>
+      <li><a href="#outputs">Outputs</a></li>
+      <li><a href="#cite">Cite</a></li>
+      <li><a href="#about">About</a></li>
+    </ul>
+    <a class="nav-cta" href="https://github.com/Antony051/swift/releases/latest/download/SWIFT.exe?download=1">↓
+      Download</a>
+  </nav>
 
-<!-- ABOUT -->
-<section id="about">
-  <div class="container">
-    <div class="reveal">
-      <p class="s-label">About</p>
-      <h2 class="s-title">Built by hydrologists,<br/>for hydrologists.</h2>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-grid"></div>
+    <p class="hero-eyebrow">Free &amp; Open Source &nbsp;·&nbsp; v1.0.1 &nbsp;·&nbsp; Windows</p>
+    <h1 class="hero-title">SW<span>I</span>FT</h1>
+    <p class="hero-sub">SWAT+ Input File Tool</p>
+    <p class="hero-desc">
+      Generate ready-to-use <strong>SWAT+ weather input files</strong> from multi-station CSV data.
+      No scripting. No manual formatting. Upload, configure, generate.
+    </p>
+    <div class="hero-actions">
+      <a class="btn-primary" href="https://github.com/Antony051/swift/releases/latest/download/SWIFT.exe?download=1">↓
+        Download for Windows</a>
+      <a class="btn-outline" href="https://doi.org/10.5281/zenodo.19425950" target="_blank">View on Zenodo →</a>
     </div>
-    <div class="author-cards reveal">
+    <div class="hero-meta">
+      <span>Free to use</span>
+      <span>Works offline</span>
+      <span>NASA POWER integrated</span>
+      <span>No installation required</span>
+    </div>
+  </section>
 
-      <div class="author-card">
-        <div class="author-avatar">AKJ</div>
-        <div class="author-name">Antony Kishoare J</div>
-        <div class="author-title">PhD — AI/ML in Hydroclimatology, GIS &amp; Remote Sensing</div>
-        <div class="author-inst">Centre for Water Resources<br/>Anna University, Chennai</div>
-        <div class="author-divider"></div>
-        <div class="author-links">
-          <a class="author-link" href="https://www.linkedin.com/in/antonykishoare/" target="_blank">⌥ LinkedIn</a>
-          <a class="author-link" href="mailto:a060697.ak@gmail.com">⌥ a060697.ak@gmail.com</a>
+  <!-- SCREENSHOTS -->
+  <div class="screenshots">
+    <p class="ss-label">Interface Preview — drag to explore</p>
+    <div class="ss-track" id="ssTrack">
+      <div class="ss-item">
+        <img
+          src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgOTAwIDU2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBmb250LWZhbWlseT0iJ0lCTSBQbGV4IE1vbm8nLG1vbm9zcGFjZSI+CiAgPHJlY3Qgd2lkdGg9IjkwMCIgaGVpZ2h0PSI1NjAiIGZpbGw9IiMwZDBkMGQiLz4KICA8IS0tIEhlYWRlciAtLT4KICA8cmVjdCB3aWR0aD0iOTAwIiBoZWlnaHQ9IjY1IiBmaWxsPSIjMTQxNDE0IiBzdHJva2U9IiMyYTJhMmEiIHN0cm9rZS13aWR0aD0iMSIvPgogIDxyZWN0IHg9IjE4IiB5PSIxNSIgd2lkdGg9IjM0IiBoZWlnaHQ9IjM0IiByeD0iNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNGE5YjdmIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8dGV4dCB4PSIzNSIgeT0iMzYiIGZpbGw9IiM0YTliN2YiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSI2MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlNXPC90ZXh0PgogIDx0ZXh0IHg9IjY2IiB5PSIzNCIgZmlsbD0iI2U4ZTRkYyIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjUwMCIgbGV0dGVyLXNwYWNpbmc9IjEiPlNXSUZUPC90ZXh0PgogIDx0ZXh0IHg9IjY2IiB5PSI0OSIgZmlsbD0iIzZiNmI2YiIgZm9udC1zaXplPSIxMCIgbGV0dGVyLXNwYWNpbmc9IjAuNSI+U1dBVCsgSW5wdXQgRmlsZSBUb29sIMK3IHYxLjA8L3RleHQ+CiAgPHRleHQgeD0iODIwIiB5PSIzNyIgZmlsbD0iIzRhOWI3ZiIgZm9udC1zaXplPSIxMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgbGV0dGVyLXNwYWNpbmc9IjEiPlNXQVQrIFJFQURZPC90ZXh0PgogIDxyZWN0IHg9Ijc3MyIgeT0iMjQiIHdpZHRoPSIxMDgiIGhlaWdodD0iMjAiIHJ4PSIyIiBmaWxsPSJub25lIiBzdHJva2U9IiMzYTZiNWMiIHN0cm9rZS13aWR0aD0iMSIvPgogIDwhLS0gU2lkZWJhciAtLT4KICA8cmVjdCB4PSIwIiB5PSI2NSIgd2lkdGg9IjI0MCIgaGVpZ2h0PSI0OTUiIGZpbGw9IiMxNDE0MTQiIHN0cm9rZT0iIzJhMmEyYSIgc3Ryb2tlLXdpZHRoPSIwLjUiLz4KICA8dGV4dCB4PSIxOCIgeT0iMTAwIiBmaWxsPSIjNmI2YjZiIiBmb250LXNpemU9IjkiIGxldHRlci1zcGFjaW5nPSIyIj5JTlBVVFM8L3RleHQ+CiAgPCEtLSBBY3RpdmUgaXRlbSAtLT4KICA8cmVjdCB4PSIxMCIgeT0iMTA4IiB3aWR0aD0iMjIwIiBoZWlnaHQ9IjM2IiByeD0iNCIgZmlsbD0icmdiYSg3NCwxNTUsMTI3LDAuMTUpIiBzdHJva2U9IiMzYTZiNWMiIHN0cm9rZS13aWR0aD0iMSIvPgogIDx0ZXh0IHg9IjI4IiB5PSIxMjkiIGZpbGw9IiM0YTliN2YiIGZvbnQtc2l6ZT0iMTAiPjAxPC90ZXh0PgogIDx0ZXh0IHg9IjQ4IiB5PSIxMjkiIGZpbGw9IiNlOGU0ZGMiIGZvbnQtc2l6ZT0iMTIiIGZvbnQtd2VpZ2h0PSI1MDAiPlN0YXRpb24gTWV0YWRhdGE8L3RleHQ+CiAgPCEtLSBPdGhlciBpdGVtcyAtLT4KICA8dGV4dCB4PSIyOCIgeT0iMTY4IiBmaWxsPSIjNmI2YjZiIiBmb250LXNpemU9IjEwIj4wMjwvdGV4dD4KICA8dGV4dCB4PSI0OCIgeT0iMTY4IiBmaWxsPSIjOWE5YTlhIiBmb250LXNpemU9IjEyIj5SZXF1aXJlZCBXZWF0aGVyPC90ZXh0PgogIDx0ZXh0IHg9IjI4IiB5PSIyMDUiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iMTAiPjAzPC90ZXh0PgogIDx0ZXh0IHg9IjQ4IiB5PSIyMDUiIGZpbGw9IiM5YTlhOWEiIGZvbnQtc2l6ZT0iMTIiPk9wdGlvbmFsIFdlYXRoZXI8L3RleHQ+CiAgPHRleHQgeD0iMTgiIHk9IjI0MCIgZmlsbD0iIzZiNmI2YiIgZm9udC1zaXplPSI5IiBsZXR0ZXItc3BhY2luZz0iMiI+U0VUVElOR1M8L3RleHQ+CiAgPHRleHQgeD0iMjgiIHk9IjI2NSIgZmlsbD0iIzZiNmI2YiIgZm9udC1zaXplPSIxMCI+MDQ8L3RleHQ+CiAgPHRleHQgeD0iNDgiIHk9IjI2NSIgZmlsbD0iIzlhOWE5YSIgZm9udC1zaXplPSIxMiI+U2V0dGluZ3M8L3RleHQ+CiAgPHRleHQgeD0iMTgiIHk9IjMwMCIgZmlsbD0iIzZiNmI2YiIgZm9udC1zaXplPSI5IiBsZXR0ZXItc3BhY2luZz0iMiI+T1VUUFVUPC90ZXh0PgogIDx0ZXh0IHg9IjI4IiB5PSIzMjUiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iMTAiPjA1PC90ZXh0PgogIDx0ZXh0IHg9IjQ4IiB5PSIzMjUiIGZpbGw9IiM5YTlhOWEiIGZvbnQtc2l6ZT0iMTIiPkdlbmVyYXRlICZhbXA7IERvd25sb2FkPC90ZXh0PgogIDwhLS0gTWFpbiBwYW5lbCAtLT4KICA8cmVjdCB4PSIzIiB5PSI5NyIgd2lkdGg9IjMiIGhlaWdodD0iMTQiIHJ4PSIyIiBmaWxsPSIjNGE5YjdmIi8+CiAgPHRleHQgeD0iMjYyIiB5PSIxMTAiIGZpbGw9IiNlOGU0ZGMiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSI2MDAiIGxldHRlci1zcGFjaW5nPSIwLjUiPlN0YXRpb24gTWV0YWRhdGE8L3RleHQ+CiAgPHRleHQgeD0iMjYyIiB5PSIxMzAiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iMTEiPlVwbG9hZCBhIENTViBkZXNjcmliaW5nIGVhY2ggd2VhdGhlciBzdGF0aW9uLiBPbmUgcm93IHBlciBzdGF0aW9uLjwvdGV4dD4KICA8IS0tIEluZm8gYm94IC0tPgogIDxyZWN0IHg9IjI1MCIgeT0iMTQ1IiB3aWR0aD0iNjIwIiBoZWlnaHQ9IjYyIiByeD0iNCIgZmlsbD0iIzFjMWMxYyIgc3Ryb2tlPSIjMmEyYTJhIiBzdHJva2Utd2lkdGg9IjEiLz4KICA8cmVjdCB4PSIyNTAiIHk9IjE0NSIgd2lkdGg9IjMiIGhlaWdodD0iNjIiIHJ4PSIyIiBmaWxsPSIjM2E2YjVjIi8+CiAgPHRleHQgeD0iMjY4IiB5PSIxNjUiIGZpbGw9IiM5YTlhOWEiIGZvbnQtc2l6ZT0iMTEiPlJlcXVpcmVkIGNvbHVtbnM6PC90ZXh0PgogIDxyZWN0IHg9IjM3OCIgeT0iMTUzIiB3aWR0aD0iMjAiIGhlaWdodD0iMTYiIHJ4PSIyIiBmaWxsPSJyZ2JhKDc0LDE1NSwxMjcsMC4xNSkiLz4KICA8dGV4dCB4PSIzODMiIHk9IjE2NSIgZmlsbD0iIzRhOWI3ZiIgZm9udC1zaXplPSIxMCI+aWQ8L3RleHQ+CiAgPHJlY3QgeD0iNDA0IiB5PSIxNTMiIHdpZHRoPSIzNiIgaGVpZ2h0PSIxNiIgcng9IjIiIGZpbGw9InJnYmEoNzQsMTU1LDEyNywwLjE1KSIvPgogIDx0ZXh0IHg9IjQwOSIgeT0iMTY1IiBmaWxsPSIjNGE5YjdmIiBmb250LXNpemU9IjEwIj5uYW1lPC90ZXh0PgogIDxyZWN0IHg9IjQ0NiIgeT0iMTUzIiB3aWR0aD0iMjIiIGhlaWdodD0iMTYiIHJ4PSIyIiBmaWxsPSJyZ2JhKDc0LDE1NSwxMjcsMC4xNSkiLz4KICA8dGV4dCB4PSI0NTEiIHk9IjE2NSIgZmlsbD0iIzRhOWI3ZiIgZm9udC1zaXplPSIxMCI+bGF0PC90ZXh0PgogIDxyZWN0IHg9IjQ3NCIgeT0iMTUzIiB3aWR0aD0iMjQiIGhlaWdodD0iMTYiIHJ4PSIyIiBmaWxsPSJyZ2JhKDc0LDE1NSwxMjcsMC4xNSkiLz4KICA8dGV4dCB4PSI0NzkiIHk9IjE2NSIgZmlsbD0iIzRhOWI3ZiIgZm9udC1zaXplPSIxMCI+bG9uPC90ZXh0PgogIDxyZWN0IHg9IjUwNCIgeT0iMTUzIiB3aWR0aD0iMjgiIGhlaWdodD0iMTYiIHJ4PSIyIiBmaWxsPSJyZ2JhKDc0LDE1NSwxMjcsMC4xNSkiLz4KICA8dGV4dCB4PSI1MDkiIHk9IjE2NSIgZmlsbD0iIzRhOWI3ZiIgZm9udC1zaXplPSIxMCI+ZWxldjwvdGV4dD4KICA8dGV4dCB4PSIyNjgiIHk9IjE5NSIgZmlsbD0iIzlhOWE5YSIgZm9udC1zaXplPSIxMSI+U3RhdGlvbiBuYW1lcyBiZWNvbWUgZmlsZW5hbWVzLiBVc2Ugc2ltcGxlIGFscGhhbnVtZXJpYyBuYW1lcy48L3RleHQ+CiAgPCEtLSBVcGxvYWQgY2FyZCAtLT4KICA8cmVjdCB4PSIyNTAiIHk9IjIyMiIgd2lkdGg9IjIwMCIgaGVpZ2h0PSIxMDAiIHJ4PSI2IiBmaWxsPSIjMWMxYzFjIiBzdHJva2U9IiMyYTJhMmEiIHN0cm9rZS13aWR0aD0iMSIvPgogIDx0ZXh0IHg9IjI2OCIgeT0iMjU3IiBmb250LXNpemU9IjE4Ij7wn5OLPC90ZXh0PgogIDx0ZXh0IHg9IjI2OCIgeT0iMjg0IiBmaWxsPSIjZThlNGRjIiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iNTAwIj5TdGF0aW9ucyBDU1Y8L3RleHQ+CiAgPHJlY3QgeD0iMjk4IiB5PSIyNzMiIHdpZHRoPSIyNiIgaGVpZ2h0PSIxNCIgcng9IjIiIGZpbGw9InJnYmEoNzQsMTU1LDEyNywwLjE1KSIvPgogIDx0ZXh0IHg9IjMwMSIgeT0iMjgzIiBmaWxsPSIjNGE5YjdmIiBmb250LXNpemU9IjkiIGxldHRlci1zcGFjaW5nPSIwLjUiPlJFUTwvdGV4dD4KICA8dGV4dCB4PSIyNjgiIHk9IjMwNCIgZmlsbD0iIzZiNmI2YiIgZm9udC1zaXplPSIxMSI+Q2xpY2sgdG8gdXBsb2FkPC90ZXh0Pgo8L3N2Zz4="
+          alt="Station Metadata" />
+        <div class="ss-caption">01 — Station Metadata</div>
+      </div>
+      <div class="ss-item">
+        <img
+          src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgOTAwIDU2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBmb250LWZhbWlseT0iJ0lCTSBQbGV4IE1vbm8nLG1vbm9zcGFjZSI+CiAgPHJlY3Qgd2lkdGg9IjkwMCIgaGVpZ2h0PSI1NjAiIGZpbGw9IiMwZDBkMGQiLz4KICA8cmVjdCB3aWR0aD0iOTAwIiBoZWlnaHQ9IjY1IiBmaWxsPSIjMTQxNDE0IiBzdHJva2U9IiMyYTJhMmEiIHN0cm9rZS13aWR0aD0iMSIvPgogIDxyZWN0IHg9IjE4IiB5PSIxNSIgd2lkdGg9IjM0IiBoZWlnaHQ9IjM0IiByeD0iNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNGE5YjdmIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8dGV4dCB4PSIzNSIgeT0iMzYiIGZpbGw9IiM0YTliN2YiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSI2MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlNXPC90ZXh0PgogIDx0ZXh0IHg9IjY2IiB5PSIzNCIgZmlsbD0iI2U4ZTRkYyIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjUwMCIgbGV0dGVyLXNwYWNpbmc9IjEiPlNXSUZUPC90ZXh0PgogIDx0ZXh0IHg9IjY2IiB5PSI0OSIgZmlsbD0iIzZiNmI2YiIgZm9udC1zaXplPSIxMCIgbGV0dGVyLXNwYWNpbmc9IjAuNSI+U1dBVCsgSW5wdXQgRmlsZSBUb29sIMK3IHYxLjA8L3RleHQ+CiAgPHRleHQgeD0iODIwIiB5PSIzNyIgZmlsbD0iIzRhOWI3ZiIgZm9udC1zaXplPSIxMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgbGV0dGVyLXNwYWNpbmc9IjEiPlNXQVQrIFJFQURZPC90ZXh0PgogIDxyZWN0IHg9Ijc3MyIgeT0iMjQiIHdpZHRoPSIxMDgiIGhlaWdodD0iMjAiIHJ4PSIyIiBmaWxsPSJub25lIiBzdHJva2U9IiMzYTZiNWMiIHN0cm9rZS13aWR0aD0iMSIvPgogIDxyZWN0IHg9IjAiIHk9IjY1IiB3aWR0aD0iMjQwIiBoZWlnaHQ9IjQ5NSIgZmlsbD0iIzE0MTQxNCIgc3Ryb2tlPSIjMmEyYTJhIiBzdHJva2Utd2lkdGg9IjAuNSIvPgogIDx0ZXh0IHg9IjE4IiB5PSIxMDAiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iOSIgbGV0dGVyLXNwYWNpbmc9IjIiPklOUFVUUzwvdGV4dD4KICA8dGV4dCB4PSIyOCIgeT0iMTMyIiBmaWxsPSIjNmI2YjZiIiBmb250LXNpemU9IjEwIj4wMTwvdGV4dD4KICA8dGV4dCB4PSI0OCIgeT0iMTMyIiBmaWxsPSIjOWE5YTlhIiBmb250LXNpemU9IjEyIj5TdGF0aW9uIE1ldGFkYXRhPC90ZXh0PgogIDxyZWN0IHg9IjEwIiB5PSIxNDQiIHdpZHRoPSIyMjAiIGhlaWdodD0iMzYiIHJ4PSI0IiBmaWxsPSJyZ2JhKDc0LDE1NSwxMjcsMC4xNSkiIHN0cm9rZT0iIzNhNmI1YyIgc3Ryb2tlLXdpZHRoPSIxIi8+CiAgPHRleHQgeD0iMjgiIHk9IjE2NiIgZmlsbD0iIzRhOWI3ZiIgZm9udC1zaXplPSIxMCI+MDI8L3RleHQ+CiAgPHRleHQgeD0iNDgiIHk9IjE2NiIgZmlsbD0iI2U4ZTRkYyIgZm9udC1zaXplPSIxMiIgZm9udC13ZWlnaHQ9IjUwMCI+UmVxdWlyZWQgV2VhdGhlcjwvdGV4dD4KICA8dGV4dCB4PSIyOCIgeT0iMjA1IiBmaWxsPSIjNmI2YjZiIiBmb250LXNpemU9IjEwIj4wMzwvdGV4dD4KICA8dGV4dCB4PSI0OCIgeT0iMjA1IiBmaWxsPSIjOWE5YTlhIiBmb250LXNpemU9IjEyIj5PcHRpb25hbCBXZWF0aGVyPC90ZXh0PgogIDx0ZXh0IHg9IjE4IiB5PSIyNDAiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iOSIgbGV0dGVyLXNwYWNpbmc9IjIiPlNFVFRJTkdTPC90ZXh0PgogIDx0ZXh0IHg9IjI4IiB5PSIyNjUiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iMTAiPjA0PC90ZXh0PgogIDx0ZXh0IHg9IjQ4IiB5PSIyNjUiIGZpbGw9IiM5YTlhOWEiIGZvbnQtc2l6ZT0iMTIiPlNldHRpbmdzPC90ZXh0PgogIDx0ZXh0IHg9IjE4IiB5PSIzMDAiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iOSIgbGV0dGVyLXNwYWNpbmc9IjIiPk9VVFBVVDwvdGV4dD4KICA8dGV4dCB4PSIyOCIgeT0iMzI1IiBmaWxsPSIjNmI2YjZiIiBmb250LXNpemU9IjEwIj4wNTwvdGV4dD4KICA8dGV4dCB4PSI0OCIgeT0iMzI1IiBmaWxsPSIjOWE5YTlhIiBmb250LXNpemU9IjEyIj5HZW5lcmF0ZSAmYW1wOyBEb3dubG9hZDwvdGV4dD4KICA8IS0tIFBhbmVsIGhlYWRlciBhY2NlbnQgLS0+CiAgPHJlY3QgeD0iMjUzIiB5PSI5NyIgd2lkdGg9IjMiIGhlaWdodD0iMTQiIHJ4PSIyIiBmaWxsPSIjNGE5YjdmIi8+CiAgPHRleHQgeD0iMjY1IiB5PSIxMTAiIGZpbGw9IiNlOGU0ZGMiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSI2MDAiIGxldHRlci1zcGFjaW5nPSIwLjUiPlJlcXVpcmVkIFdlYXRoZXIgRGF0YTwvdGV4dD4KICA8dGV4dCB4PSIyNjUiIHk9IjEzMCIgZmlsbD0iIzZiNmI2YiIgZm9udC1zaXplPSIxMSI+VGhyZWUgQ1NWIGZpbGVzIGluIHRyYW5zcG9zZWQgbXVsdGktc3RhdGlvbiBmb3JtYXQgYXJlIHJlcXVpcmVkLjwvdGV4dD4KICA8cmVjdCB4PSIyNTAiIHk9IjE0NSIgd2lkdGg9IjYyMCIgaGVpZ2h0PSI1MCIgcng9IjQiIGZpbGw9IiMxYzFjMWMiIHN0cm9rZT0iIzJhMmEyYSIvPgogIDxyZWN0IHg9IjI1MCIgeT0iMTQ1IiB3aWR0aD0iMyIgaGVpZ2h0PSI1MCIgcng9IjIiIGZpbGw9IiMzYTZiNWMiLz4KICA8dGV4dCB4PSIyNjgiIHk9IjE2NSIgZmlsbD0iIzlhOWE5YSIgZm9udC1zaXplPSIxMSI+Rm9ybWF0OiByb3dzID0gZGF0ZXMgKFlZWVktTU0tREQpLCBjb2x1bW5zID0gc3RhdGlvbnMgaW4gc2FtZSBvcmRlciBhcyBzdGF0aW9ucyBDU1YuPC90ZXh0PgogIDx0ZXh0IHg9IjI2OCIgeT0iMTgzIiBmaWxsPSIjOWE5YTlhIiBmb250LXNpemU9IjExIj5GaXJzdCAyIHJvd3MgYXJlIGhlYWRlciBpbmZvIGFuZCBhcmUgc2tpcHBlZCBhdXRvbWF0aWNhbGx5LiBWYWx1ZXMgbXVzdCBiZSBudW1lcmljLjwvdGV4dD4KICA8IS0tIFRocmVlIGNhcmRzIC0tPgogIDxyZWN0IHg9IjI1MCIgeT0iMjEyIiB3aWR0aD0iMTkwIiBoZWlnaHQ9IjExMCIgcng9IjYiIGZpbGw9IiMxYzFjMWMiIHN0cm9rZT0iIzJhMmEyYSIvPgogIDx0ZXh0IHg9IjI2OCIgeT0iMjQ4IiBmb250LXNpemU9IjIwIj7wn4yn77iPPC90ZXh0PgogIDx0ZXh0IHg9IjI2OCIgeT0iMjc4IiBmaWxsPSIjZThlNGRjIiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iNTAwIj5QcmVjaXBpdGF0aW9uPC90ZXh0PgogIDxyZWN0IHg9IjM1OCIgeT0iMjY3IiB3aWR0aD0iMjYiIGhlaWdodD0iMTQiIHJ4PSIyIiBmaWxsPSJyZ2JhKDc0LDE1NSwxMjcsMC4xNSkiLz4KICA8dGV4dCB4PSIzNjEiIHk9IjI3NyIgZmlsbD0iIzRhOWI3ZiIgZm9udC1zaXplPSI5Ij5SRVE8L3RleHQ+CiAgPHRleHQgeD0iMjY4IiB5PSIzMDAiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iMTAiPm1tL2RheSDCtyBDbGljayB0byB1cGxvYWQ8L3RleHQ+CiAgPHJlY3QgeD0iNDU1IiB5PSIyMTIiIHdpZHRoPSIxOTAiIGhlaWdodD0iMTEwIiByeD0iNiIgZmlsbD0iIzFjMWMxYyIgc3Ryb2tlPSIjMmEyYTJhIi8+CiAgPHRleHQgeD0iNDczIiB5PSIyNDgiIGZvbnQtc2l6ZT0iMjAiPvCfjKHvuI88L3RleHQ+CiAgPHRleHQgeD0iNDczIiB5PSIyNzgiIGZpbGw9IiNlOGU0ZGMiIGZvbnQtc2l6ZT0iMTEiIGZvbnQtd2VpZ2h0PSI1MDAiPk1heCBUZW1wZXJhdHVyZTwvdGV4dD4KICA8cmVjdCB4PSI1NzEiIHk9IjI2NyIgd2lkdGg9IjI2IiBoZWlnaHQ9IjE0IiByeD0iMiIgZmlsbD0icmdiYSg3NCwxNTUsMTI3LDAuMTUpIi8+CiAgPHRleHQgeD0iNTc0IiB5PSIyNzciIGZpbGw9IiM0YTliN2YiIGZvbnQtc2l6ZT0iOSI+UkVRPC90ZXh0PgogIDx0ZXh0IHg9IjQ3MyIgeT0iMzAwIiBmaWxsPSIjNmI2YjZiIiBmb250LXNpemU9IjEwIj7CsEMgwrcgQ2xpY2sgdG8gdXBsb2FkPC90ZXh0PgogIDxyZWN0IHg9IjY2MCIgeT0iMjEyIiB3aWR0aD0iMjEwIiBoZWlnaHQ9IjExMCIgcng9IjYiIGZpbGw9IiMxYzFjMWMiIHN0cm9rZT0iIzJhMmEyYSIvPgogIDx0ZXh0IHg9IjY3OCIgeT0iMjQ4IiBmb250LXNpemU9IjIwIj7inYTvuI88L3RleHQ+CiAgPHRleHQgeD0iNjc4IiB5PSIyNzgiIGZpbGw9IiNlOGU0ZGMiIGZvbnQtc2l6ZT0iMTEiIGZvbnQtd2VpZ2h0PSI1MDAiPk1pbiBUZW1wZXJhdHVyZTwvdGV4dD4KICA8cmVjdCB4PSI3NzEiIHk9IjI2NyIgd2lkdGg9IjI2IiBoZWlnaHQ9IjE0IiByeD0iMiIgZmlsbD0icmdiYSg3NCwxNTUsMTI3LDAuMTUpIi8+CiAgPHRleHQgeD0iNzc0IiB5PSIyNzciIGZpbGw9IiM0YTliN2YiIGZvbnQtc2l6ZT0iOSI+UkVRPC90ZXh0PgogIDx0ZXh0IHg9IjY3OCIgeT0iMzAwIiBmaWxsPSIjNmI2YjZiIiBmb250LXNpemU9IjEwIj7CsEMgwrcgQ2xpY2sgdG8gdXBsb2FkPC90ZXh0Pgo8L3N2Zz4="
+          alt="Required Weather" />
+        <div class="ss-caption">02 — Required Weather Data</div>
+      </div>
+      <div class="ss-item">
+        <img
+          src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgOTAwIDU2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBmb250LWZhbWlseT0iJ0lCTSBQbGV4IE1vbm8nLG1vbm9zcGFjZSI+CiAgPHJlY3Qgd2lkdGg9IjkwMCIgaGVpZ2h0PSI1NjAiIGZpbGw9IiMwZDBkMGQiLz4KICA8cmVjdCB3aWR0aD0iOTAwIiBoZWlnaHQ9IjY1IiBmaWxsPSIjMTQxNDE0IiBzdHJva2U9IiMyYTJhMmEiIHN0cm9rZS13aWR0aD0iMSIvPgogIDxyZWN0IHg9IjE4IiB5PSIxNSIgd2lkdGg9IjM0IiBoZWlnaHQ9IjM0IiByeD0iNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNGE5YjdmIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8dGV4dCB4PSIzNSIgeT0iMzYiIGZpbGw9IiM0YTliN2YiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSI2MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlNXPC90ZXh0PgogIDx0ZXh0IHg9IjY2IiB5PSIzNCIgZmlsbD0iI2U4ZTRkYyIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjUwMCIgbGV0dGVyLXNwYWNpbmc9IjEiPlNXSUZUPC90ZXh0PgogIDx0ZXh0IHg9IjY2IiB5PSI0OSIgZmlsbD0iIzZiNmI2YiIgZm9udC1zaXplPSIxMCIgbGV0dGVyLXNwYWNpbmc9IjAuNSI+U1dBVCsgSW5wdXQgRmlsZSBUb29sIMK3IHYxLjA8L3RleHQ+CiAgPHRleHQgeD0iODIwIiB5PSIzNyIgZmlsbD0iIzRhOWI3ZiIgZm9udC1zaXplPSIxMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgbGV0dGVyLXNwYWNpbmc9IjEiPlNXQVQrIFJFQURZPC90ZXh0PgogIDxyZWN0IHg9Ijc3MyIgeT0iMjQiIHdpZHRoPSIxMDgiIGhlaWdodD0iMjAiIHJ4PSIyIiBmaWxsPSJub25lIiBzdHJva2U9IiMzYTZiNWMiIHN0cm9rZS13aWR0aD0iMSIvPgogIDxyZWN0IHg9IjAiIHk9IjY1IiB3aWR0aD0iMjQwIiBoZWlnaHQ9IjQ5NSIgZmlsbD0iIzE0MTQxNCIgc3Ryb2tlPSIjMmEyYTJhIiBzdHJva2Utd2lkdGg9IjAuNSIvPgogIDx0ZXh0IHg9IjE4IiB5PSIxMDAiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iOSIgbGV0dGVyLXNwYWNpbmc9IjIiPklOUFVUUzwvdGV4dD4KICA8dGV4dCB4PSIyOCIgeT0iMTMyIiBmaWxsPSIjNmI2YjZiIiBmb250LXNpemU9IjEwIj4wMTwvdGV4dD48dGV4dCB4PSI0OCIgeT0iMTMyIiBmaWxsPSIjOWE5YTlhIiBmb250LXNpemU9IjEyIj5TdGF0aW9uIE1ldGFkYXRhPC90ZXh0PgogIDx0ZXh0IHg9IjI4IiB5PSIxNjgiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iMTAiPjAyPC90ZXh0Pjx0ZXh0IHg9IjQ4IiB5PSIxNjgiIGZpbGw9IiM5YTlhOWEiIGZvbnQtc2l6ZT0iMTIiPlJlcXVpcmVkIFdlYXRoZXI8L3RleHQ+CiAgPHJlY3QgeD0iMTAiIHk9IjE4MCIgd2lkdGg9IjIyMCIgaGVpZ2h0PSIzNiIgcng9IjQiIGZpbGw9InJnYmEoNzQsMTU1LDEyNywwLjE1KSIgc3Ryb2tlPSIjM2E2YjVjIiBzdHJva2Utd2lkdGg9IjEiLz4KICA8dGV4dCB4PSIyOCIgeT0iMjAyIiBmaWxsPSIjNGE5YjdmIiBmb250LXNpemU9IjEwIj4wMzwvdGV4dD48dGV4dCB4PSI0OCIgeT0iMjAyIiBmaWxsPSIjZThlNGRjIiBmb250LXNpemU9IjEyIiBmb250LXdlaWdodD0iNTAwIj5PcHRpb25hbCBXZWF0aGVyPC90ZXh0PgogIDx0ZXh0IHg9IjE4IiB5PSIyNDAiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iOSIgbGV0dGVyLXNwYWNpbmc9IjIiPlNFVFRJTkdTPC90ZXh0PgogIDx0ZXh0IHg9IjI4IiB5PSIyNjUiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iMTAiPjA0PC90ZXh0Pjx0ZXh0IHg9IjQ4IiB5PSIyNjUiIGZpbGw9IiM5YTlhOWEiIGZvbnQtc2l6ZT0iMTIiPlNldHRpbmdzPC90ZXh0PgogIDx0ZXh0IHg9IjE4IiB5PSIzMDAiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iOSIgbGV0dGVyLXNwYWNpbmc9IjIiPk9VVFBVVDwvdGV4dD4KICA8dGV4dCB4PSIyOCIgeT0iMzI1IiBmaWxsPSIjNmI2YjZiIiBmb250LXNpemU9IjEwIj4wNTwvdGV4dD48dGV4dCB4PSI0OCIgeT0iMzI1IiBmaWxsPSIjOWE5YTlhIiBmb250LXNpemU9IjEyIj5HZW5lcmF0ZSAmYW1wOyBEb3dubG9hZDwvdGV4dD4KICA8cmVjdCB4PSIyNTMiIHk9Ijk3IiB3aWR0aD0iMyIgaGVpZ2h0PSIxNCIgcng9IjIiIGZpbGw9IiM0YTliN2YiLz4KICA8dGV4dCB4PSIyNjUiIHk9IjExMCIgZmlsbD0iI2U4ZTRkYyIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjYwMCIgbGV0dGVyLXNwYWNpbmc9IjAuNSI+T3B0aW9uYWwgV2VhdGhlciBEYXRhPC90ZXh0PgogIDx0ZXh0IHg9IjI2NSIgeT0iMTMwIiBmaWxsPSIjNmI2YjZiIiBmb250LXNpemU9IjExIj5UaGVzZSBpbnB1dHMgZW5hYmxlIGFkZGl0aW9uYWwgb3V0cHV0IGZpbGVzLiBJZiBub3QgcHJvdmlkZWQsIHZhbHVlcyBhcmUgZXN0aW1hdGVkLjwvdGV4dD4KICA8cmVjdCB4PSIyNTAiIHk9IjE1NSIgd2lkdGg9IjE5MCIgaGVpZ2h0PSIxMTAiIHJ4PSI2IiBmaWxsPSIjMWMxYzFjIiBzdHJva2U9IiMyYTJhMmEiLz4KICA8dGV4dCB4PSIyNjgiIHk9IjE5MSIgZm9udC1zaXplPSIyMCI+4piA77iPPC90ZXh0PgogIDx0ZXh0IHg9IjI2OCIgeT0iMjIxIiBmaWxsPSIjZThlNGRjIiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iNTAwIj5Tb2xhciBSYWRpYXRpb248L3RleHQ+CiAgPHJlY3QgeD0iMzYwIiB5PSIyMTAiIHdpZHRoPSIyNiIgaGVpZ2h0PSIxNCIgcng9IjIiIGZpbGw9IiMxYzFjMWMiIHN0cm9rZT0iIzJhMmEyYSIvPgogIDx0ZXh0IHg9IjM2NCIgeT0iMjIwIiBmaWxsPSIjNmI2YjZiIiBmb250LXNpemU9IjkiPk9QVDwvdGV4dD4KICA8dGV4dCB4PSIyNjgiIHk9IjI0MyIgZmlsbD0iIzZiNmI2YiIgZm9udC1zaXplPSIxMCI+TUovbcKyL2RheSDCtyBDbGljayB0byB1cGxvYWQ8L3RleHQ+CiAgPHJlY3QgeD0iNDU1IiB5PSIxNTUiIHdpZHRoPSIxOTAiIGhlaWdodD0iMTEwIiByeD0iNiIgZmlsbD0iIzFjMWMxYyIgc3Ryb2tlPSIjMmEyYTJhIi8+CiAgPHRleHQgeD0iNDczIiB5PSIxOTEiIGZvbnQtc2l6ZT0iMjAiPvCfkqc8L3RleHQ+CiAgPHRleHQgeD0iNDczIiB5PSIyMjEiIGZpbGw9IiNlOGU0ZGMiIGZvbnQtc2l6ZT0iMTEiIGZvbnQtd2VpZ2h0PSI1MDAiPkh1bWlkaXR5IC8gRGV3cG9pbnQ8L3RleHQ+CiAgPHJlY3QgeD0iNTc1IiB5PSIyMTAiIHdpZHRoPSIyNiIgaGVpZ2h0PSIxNCIgcng9IjIiIGZpbGw9IiMxYzFjMWMiIHN0cm9rZT0iIzJhMmEyYSIvPgogIDx0ZXh0IHg9IjU3OSIgeT0iMjIwIiBmaWxsPSIjNmI2YjZiIiBmb250LXNpemU9IjkiPk9QVDwvdGV4dD4KICA8dGV4dCB4PSI0NzMiIHk9IjI0MyIgZmlsbD0iIzZiNmI2YiIgZm9udC1zaXplPSIxMCI+Q2xpY2sgdG8gdXBsb2FkPC90ZXh0PgogIDxyZWN0IHg9IjY2MCIgeT0iMTU1IiB3aWR0aD0iMjEwIiBoZWlnaHQ9IjExMCIgcng9IjYiIGZpbGw9IiMxYzFjMWMiIHN0cm9rZT0iIzJhMmEyYSIvPgogIDx0ZXh0IHg9IjY3OCIgeT0iMTkxIiBmb250LXNpemU9IjIwIj7wn5KoPC90ZXh0PgogIDx0ZXh0IHg9IjY3OCIgeT0iMjIxIiBmaWxsPSIjZThlNGRjIiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iNTAwIj5XaW5kIFNwZWVkPC90ZXh0PgogIDxyZWN0IHg9Ijc1MSIgeT0iMjEwIiB3aWR0aD0iMjYiIGhlaWdodD0iMTQiIHJ4PSIyIiBmaWxsPSIjMWMxYzFjIiBzdHJva2U9IiMyYTJhMmEiLz4KICA8dGV4dCB4PSI3NTUiIHk9IjIyMCIgZmlsbD0iIzZiNmI2YiIgZm9udC1zaXplPSI5Ij5PUFQ8L3RleHQ+CiAgPHRleHQgeD0iNjc4IiB5PSIyNDMiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iMTAiPm0vcyDCtyBDbGljayB0byB1cGxvYWQ8L3RleHQ+Cjwvc3ZnPg=="
+          alt="Optional Weather" />
+        <div class="ss-caption">03 — Optional Weather Data</div>
+      </div>
+      <div class="ss-item">
+        <img
+          src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgOTAwIDU2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBmb250LWZhbWlseT0iJ0lCTSBQbGV4IE1vbm8nLG1vbm9zcGFjZSI+CiAgPHJlY3Qgd2lkdGg9IjkwMCIgaGVpZ2h0PSI1NjAiIGZpbGw9IiMwZDBkMGQiLz4KICA8cmVjdCB3aWR0aD0iOTAwIiBoZWlnaHQ9IjY1IiBmaWxsPSIjMTQxNDE0IiBzdHJva2U9IiMyYTJhMmEiIHN0cm9rZS13aWR0aD0iMSIvPgogIDxyZWN0IHg9IjE4IiB5PSIxNSIgd2lkdGg9IjM0IiBoZWlnaHQ9IjM0IiByeD0iNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNGE5YjdmIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8dGV4dCB4PSIzNSIgeT0iMzYiIGZpbGw9IiM0YTliN2YiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSI2MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlNXPC90ZXh0PgogIDx0ZXh0IHg9IjY2IiB5PSIzNCIgZmlsbD0iI2U4ZTRkYyIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjUwMCIgbGV0dGVyLXNwYWNpbmc9IjEiPlNXSUZUPC90ZXh0PgogIDx0ZXh0IHg9IjY2IiB5PSI0OSIgZmlsbD0iIzZiNmI2YiIgZm9udC1zaXplPSIxMCIgbGV0dGVyLXNwYWNpbmc9IjAuNSI+U1dBVCsgSW5wdXQgRmlsZSBUb29sIMK3IHYxLjA8L3RleHQ+CiAgPHRleHQgeD0iODIwIiB5PSIzNyIgZmlsbD0iIzRhOWI3ZiIgZm9udC1zaXplPSIxMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgbGV0dGVyLXNwYWNpbmc9IjEiPlNXQVQrIFJFQURZPC90ZXh0PgogIDxyZWN0IHg9Ijc3MyIgeT0iMjQiIHdpZHRoPSIxMDgiIGhlaWdodD0iMjAiIHJ4PSIyIiBmaWxsPSJub25lIiBzdHJva2U9IiMzYTZiNWMiIHN0cm9rZS13aWR0aD0iMSIvPgogIDxyZWN0IHg9IjAiIHk9IjY1IiB3aWR0aD0iMjQwIiBoZWlnaHQ9IjQ5NSIgZmlsbD0iIzE0MTQxNCIgc3Ryb2tlPSIjMmEyYTJhIiBzdHJva2Utd2lkdGg9IjAuNSIvPgogIDx0ZXh0IHg9IjE4IiB5PSIxMDAiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iOSIgbGV0dGVyLXNwYWNpbmc9IjIiPklOUFVUUzwvdGV4dD4KICA8dGV4dCB4PSIyOCIgeT0iMTMyIiBmaWxsPSIjNmI2YjZiIiBmb250LXNpemU9IjEwIj4wMTwvdGV4dD48dGV4dCB4PSI0OCIgeT0iMTMyIiBmaWxsPSIjOWE5YTlhIiBmb250LXNpemU9IjEyIj5TdGF0aW9uIE1ldGFkYXRhPC90ZXh0PgogIDx0ZXh0IHg9IjI4IiB5PSIxNjgiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iMTAiPjAyPC90ZXh0Pjx0ZXh0IHg9IjQ4IiB5PSIxNjgiIGZpbGw9IiM5YTlhOWEiIGZvbnQtc2l6ZT0iMTIiPlJlcXVpcmVkIFdlYXRoZXI8L3RleHQ+CiAgPHRleHQgeD0iMjgiIHk9IjIwNCIgZmlsbD0iIzZiNmI2YiIgZm9udC1zaXplPSIxMCI+MDM8L3RleHQ+PHRleHQgeD0iNDgiIHk9IjIwNCIgZmlsbD0iIzlhOWE5YSIgZm9udC1zaXplPSIxMiI+T3B0aW9uYWwgV2VhdGhlcjwvdGV4dD4KICA8dGV4dCB4PSIxOCIgeT0iMjQwIiBmaWxsPSIjNmI2YjZiIiBmb250LXNpemU9IjkiIGxldHRlci1zcGFjaW5nPSIyIj5TRVRUSU5HUzwvdGV4dD4KICA8cmVjdCB4PSIxMCIgeT0iMjQ4IiB3aWR0aD0iMjIwIiBoZWlnaHQ9IjM2IiByeD0iNCIgZmlsbD0icmdiYSg3NCwxNTUsMTI3LDAuMTUpIiBzdHJva2U9IiMzYTZiNWMiIHN0cm9rZS13aWR0aD0iMSIvPgogIDx0ZXh0IHg9IjI4IiB5PSIyNzAiIGZpbGw9IiM0YTliN2YiIGZvbnQtc2l6ZT0iMTAiPjA0PC90ZXh0Pjx0ZXh0IHg9IjQ4IiB5PSIyNzAiIGZpbGw9IiNlOGU0ZGMiIGZvbnQtc2l6ZT0iMTIiIGZvbnQtd2VpZ2h0PSI1MDAiPlNldHRpbmdzPC90ZXh0PgogIDx0ZXh0IHg9IjE4IiB5PSIzMTAiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iOSIgbGV0dGVyLXNwYWNpbmc9IjIiPk9VVFBVVDwvdGV4dD4KICA8dGV4dCB4PSIyOCIgeT0iMzM1IiBmaWxsPSIjNmI2YjZiIiBmb250LXNpemU9IjEwIj4wNTwvdGV4dD48dGV4dCB4PSI0OCIgeT0iMzM1IiBmaWxsPSIjOWE5YTlhIiBmb250LXNpemU9IjEyIj5HZW5lcmF0ZSAmYW1wOyBEb3dubG9hZDwvdGV4dD4KICA8cmVjdCB4PSIyNTMiIHk9Ijk3IiB3aWR0aD0iMyIgaGVpZ2h0PSIxNCIgcng9IjIiIGZpbGw9IiM0YTliN2YiLz4KICA8dGV4dCB4PSIyNjUiIHk9IjExMCIgZmlsbD0iI2U4ZTRkYyIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjYwMCIgbGV0dGVyLXNwYWNpbmc9IjAuNSI+U2V0dGluZ3M8L3RleHQ+CiAgPHRleHQgeD0iMjY1IiB5PSIxMzAiIGZpbGw9IiM2YjZiNmIiIGZvbnQtc2l6ZT0iMTEiPkNvbmZpZ3VyZSBvdXRwdXQgb3B0aW9ucyBiZWZvcmUgZ2VuZXJhdGluZyBmaWxlcy4gRGF0YSB3aWxsIGJlIHNsaWNlZCB0byB0aGlzIHBlcmlvZC48L3RleHQ+CiAgPHRleHQgeD0iMjY1IiB5PSIxNjIiIGZpbGw9IiM5YTlhOWEiIGZvbnQtc2l6ZT0iMTEiPlN0YXJ0IGRhdGU8L3RleHQ+CiAgPHJlY3QgeD0iMjY1IiB5PSIxNzAiIHdpZHRoPSI0MDAiIGhlaWdodD0iMzIiIHJ4PSI0IiBmaWxsPSIjZjRmNGYwIiBzdHJva2U9IiNkNGQ0ZDQiLz4KICA8dGV4dCB4PSIyNzgiIHk9IjE5MSIgZmlsbD0iIzg4OCIgZm9udC1zaXplPSIxMiI+ZGQtbW0teXl5eTwvdGV4dD4KICA8dGV4dCB4PSIyNjUiIHk9IjIyMiIgZmlsbD0iIzlhOWE5YSIgZm9udC1zaXplPSIxMSI+RW5kIGRhdGU8L3RleHQ+CiAgPHJlY3QgeD0iMjY1IiB5PSIyMzAiIHdpZHRoPSI0MDAiIGhlaWdodD0iMzIiIHJ4PSI0IiBmaWxsPSIjZjRmNGYwIiBzdHJva2U9IiNkNGQ0ZDQiLz4KICA8dGV4dCB4PSIyNzgiIHk9IjI1MSIgZmlsbD0iIzg4OCIgZm9udC1zaXplPSIxMiI+ZGQtbW0teXl5eTwvdGV4dD4KICA8dGV4dCB4PSIyNjUiIHk9IjI4NCIgZmlsbD0iIzlhOWE5YSIgZm9udC1zaXplPSIxMSI+T3V0cHV0IGRpcmVjdG9yeTwvdGV4dD4KICA8cmVjdCB4PSIyNjUiIHk9IjI5MiIgd2lkdGg9IjE4MCIgaGVpZ2h0PSIzMiIgcng9IjQiIGZpbGw9IiMxYzFjMWMiIHN0cm9rZT0iIzJhMmEyYSIvPgogIDx0ZXh0IHg9IjI4NSIgeT0iMzEzIiBmaWxsPSIjZThlNGRjIiBmb250LXNpemU9IjExIj5TZWxlY3QgRm9sZGVyLi4uPC90ZXh0PgogIDx0ZXh0IHg9IjI2NSIgeT0iMzQ2IiBmaWxsPSIjOWE5YTlhIiBmb250LXNpemU9IjExIj5FdmFwb3RyYW5zcGlyYXRpb24gKEVUKSBNZXRob2Q8L3RleHQ+CiAgPHJlY3QgeD0iMjY1IiB5PSIzNTYiIHdpZHRoPSIzMTAiIGhlaWdodD0iMzIiIHJ4PSI0IiBmaWxsPSJyZ2JhKDc0LDE1NSwxMjcsMC4xNSkiIHN0cm9rZT0iIzRhOWI3ZiIvPgogIDx0ZXh0IHg9IjI4NSIgeT0iMzc3IiBmaWxsPSIjZThlNGRjIiBmb250LXNpemU9IjExIj5IYXJncmVhdmVzLVNhbWFuaSAocmVxdWlyZXMgVGVtcGVyYXR1cmUpPC90ZXh0PgogIDxyZWN0IHg9IjI2NSIgeT0iMzk2IiB3aWR0aD0iMzQwIiBoZWlnaHQ9IjMyIiByeD0iNCIgZmlsbD0iIzFjMWMxYyIgc3Ryb2tlPSIjMmEyYTJhIi8+CiAgPHRleHQgeD0iMjg1IiB5PSI0MTciIGZpbGw9IiM5YTlhOWEiIGZvbnQtc2l6ZT0iMTEiPkZBTy01NiBQZW5tYW4tTW9udGVpdGggKHJlcXVpcmVzIFNvbGFyLCBIdW1pZGl0eSwgV2luZCk8L3RleHQ+Cjwvc3ZnPg=="
+          alt="Settings" />
+        <div class="ss-caption">04 — Settings &amp; ET Method</div>
+      </div>
+      <div class="ss-item">
+        <img
+          src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgOTAwIDU2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBmb250LWZhbWlseT0iJ0lCTSBQbGV4IE1vbm8nLG1vbm9zcGFjZSI+CiAgPHJlY3Qgd2lkdGg9IjkwMCIgaGVpZ2h0PSI1NjAiIGZpbGw9IiMwZDBkMGQiIG9wYWNpdHk9IjAuNSIvPgogIDxyZWN0IHdpZHRoPSI5MDAiIGhlaWdodD0iNTYwIiBmaWxsPSJyZ2JhKDAsMCwwLDAuNykiLz4KICA8IS0tIE1vZGFsIC0tPgogIDxyZWN0IHg9IjIyMCIgeT0iMTMwIiB3aWR0aD0iNDYwIiBoZWlnaHQ9IjMyMCIgcng9IjgiIGZpbGw9IiMxNDE0MTQiIHN0cm9rZT0iIzJhMmEyYSIgc3Ryb2tlLXdpZHRoPSIxIi8+CiAgPHRleHQgeD0iMjQ4IiB5PSIxNzAiIGZvbnQtc2l6ZT0iMTYiPvCfjJA8L3RleHQ+CiAgPHRleHQgeD0iMjcyIiB5PSIxNzIiIGZpbGw9IiNlOGU0ZGMiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSI2MDAiIGxldHRlci1zcGFjaW5nPSIwLjUiPk1pc3NpbmcgT3B0aW9uYWwgVmFyaWFibGVzPC90ZXh0PgogIDx0ZXh0IHg9IjI0MCIgeT0iMTk4IiBmaWxsPSIjNmI2YjZiIiBmb250LXNpemU9IjExIj5Tb21lIG9wdGlvbmFsIGRhdGEgZmlsZXMgd2VyZSBub3QgdXBsb2FkZWQuPC90ZXh0PgogIDx0ZXh0IHg9IjI0MCIgeT0iMjE0IiBmaWxsPSIjNmI2YjZiIiBmb250LXNpemU9IjExIj5DaG9vc2UgaG93IHRvIGhhbmRsZSBlYWNoIG1pc3NpbmcgdmFyaWFibGU6PC90ZXh0PgogIDwhLS0gU29sYXIgcm93IC0tPgogIDx0ZXh0IHg9IjI0MCIgeT0iMjUwIiBmaWxsPSIjOWE5YTlhIiBmb250LXNpemU9IjEyIj5Tb2xhciBSYWRpYXRpb248L3RleHQ+CiAgPHJlY3QgeD0iNDIwIiB5PSIyMzQiIHdpZHRoPSIxMTAiIGhlaWdodD0iMjYiIHJ4PSI0IiBmaWxsPSIjMWMxYzFjIiBzdHJva2U9IiMyYTJhMmEiLz4KICA8dGV4dCB4PSI0NTIiIHk9IjI1MSIgZmlsbD0iIzlhOWE5YSIgZm9udC1zaXplPSIxMSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+RmV0Y2ggTkFTQSBQT1dFUjwvdGV4dD4KICA8cmVjdCB4PSI1NDAiIHk9IjIzNCIgd2lkdGg9IjExMCIgaGVpZ2h0PSIyNiIgcng9IjQiIGZpbGw9InJnYmEoNzQsMTU1LDEyNywwLjE1KSIgc3Ryb2tlPSIjNGE5YjdmIi8+CiAgPHRleHQgeD0iNTk1IiB5PSIyNTEiIGZpbGw9IiM0YTliN2YiIGZvbnQtc2l6ZT0iMTEiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkZBTy01NiBlc3RpbWF0ZTwvdGV4dD4KICA8IS0tIEh1bWlkaXR5IHJvdyAtLT4KICA8dGV4dCB4PSIyNDAiIHk9IjI5NiIgZmlsbD0iIzlhOWE5YSIgZm9udC1zaXplPSIxMiI+SHVtaWRpdHkgLyBEZXdwb2ludDwvdGV4dD4KICA8cmVjdCB4PSI0MjAiIHk9IjI4MCIgd2lkdGg9IjExMCIgaGVpZ2h0PSIyNiIgcng9IjQiIGZpbGw9IiMxYzFjMWMiIHN0cm9rZT0iIzJhMmEyYSIvPgogIDx0ZXh0IHg9IjQ1MiIgeT0iMjk3IiBmaWxsPSIjOWE5YTlhIiBmb250LXNpemU9IjExIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5GZXRjaCBOQVNBIFBPV0VSPC90ZXh0PgogIDxyZWN0IHg9IjU0MCIgeT0iMjgwIiB3aWR0aD0iMTEwIiBoZWlnaHQ9IjI2IiByeD0iNCIgZmlsbD0icmdiYSg3NCwxNTUsMTI3LDAuMTUpIiBzdHJva2U9IiM0YTliN2YiLz4KICA8dGV4dCB4PSI1OTUiIHk9IjI5NyIgZmlsbD0iIzRhOWI3ZiIgZm9udC1zaXplPSIxMSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+U2tpcDwvdGV4dD4KICA8IS0tIFdpbmQgcm93IC0tPgogIDx0ZXh0IHg9IjI0MCIgeT0iMzQyIiBmaWxsPSIjOWE5YTlhIiBmb250LXNpemU9IjEyIj5XaW5kIFNwZWVkPC90ZXh0PgogIDxyZWN0IHg9IjQyMCIgeT0iMzI2IiB3aWR0aD0iMTEwIiBoZWlnaHQ9IjI2IiByeD0iNCIgZmlsbD0iIzFjMWMxYyIgc3Ryb2tlPSIjMmEyYTJhIi8+CiAgPHRleHQgeD0iNDUyIiB5PSIzNDMiIGZpbGw9IiM5YTlhOWEiIGZvbnQtc2l6ZT0iMTEiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkZldGNoIE5BU0EgUE9XRVI8L3RleHQ+CiAgPHJlY3QgeD0iNTQwIiB5PSIzMjYiIHdpZHRoPSIxMTAiIGhlaWdodD0iMjYiIHJ4PSI0IiBmaWxsPSJyZ2JhKDc0LDE1NSwxMjcsMC4xNSkiIHN0cm9rZT0iIzRhOWI3ZiIvPgogIDx0ZXh0IHg9IjU5NSIgeT0iMzQzIiBmaWxsPSIjNGE5YjdmIiBmb250LXNpemU9IjExIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5Ta2lwPC90ZXh0PgogIDwhLS0gQnV0dG9ucyAtLT4KICA8cmVjdCB4PSIzNDAiIHk9IjM4MiIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIzNCIgcng9IjQiIGZpbGw9IiMxYzFjMWMiIHN0cm9rZT0iIzJhMmEyYSIvPgogIDx0ZXh0IHg9IjM5MCIgeT0iNDA0IiBmaWxsPSIjOWE5YTlhIiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5DYW5jZWw8L3RleHQ+CiAgPHJlY3QgeD0iNDU1IiB5PSIzODIiIHdpZHRoPSIxMjAiIGhlaWdodD0iMzQiIHJ4PSI0IiBmaWxsPSIjNGE5YjdmIi8+CiAgPHRleHQgeD0iNTE1IiB5PSI0MDQiIGZpbGw9IiMwZDBkMGQiIGZvbnQtc2l6ZT0iMTIiIGZvbnQtd2VpZ2h0PSI2MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkNvbnRpbnVlPC90ZXh0Pgo8L3N2Zz4="
+          alt="Missing Variables" />
+        <div class="ss-caption">05 — Smart Data Source Resolution</div>
+      </div>
+    </div>
+    <div class="ss-dots" id="ssDots">
+      <button class="ss-dot active" data-idx="0"></button>
+      <button class="ss-dot" data-idx="1"></button>
+      <button class="ss-dot" data-idx="2"></button>
+      <button class="ss-dot" data-idx="3"></button>
+      <button class="ss-dot" data-idx="4"></button>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="container">
+      <div class="reveal">
+        <p class="s-label">Capabilities</p>
+        <h2 class="s-title">Everything SWAT+ needs.<br />Nothing extra.</h2>
+        <p class="s-body">SWIFT handles the tedious parts of SWAT+ model preparation — file formatting, statistics
+          computation, and data gap-filling — so you can focus on modelling.</p>
+      </div>
+      <div class="features-grid reveal">
+        <div class="feat-card">
+          <div class="feat-icon">🌧️</div>
+          <div class="feat-name">Multi-station Support</div>
+          <div class="feat-desc">Processes any number of weather stations from transposed multi-station CSVs. Station
+            names become filenames automatically.</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">📊</div>
+          <div class="feat-name">Full Statistics Engine</div>
+          <div class="feat-desc">Computes all SWAT+ weather generator statistics — wet/dry probabilities, precipitation
+            skew, temperature means and SDs — by station and month.</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">🛰️</div>
+          <div class="feat-name">NASA POWER Integration</div>
+          <div class="feat-desc">Automatically fetches missing solar radiation, wind speed, or humidity from NASA POWER
+            with parallel requests and in-session caching.</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">🏔️</div>
+          <div class="feat-name">Auto Elevation Fill</div>
+          <div class="feat-desc">Missing station elevations are retrieved from OpenTopoData (SRTM 30m / ASTER 30m) — no
+            manual DEM lookup needed.</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">🌿</div>
+          <div class="feat-name">Two ET Methods</div>
+          <div class="feat-desc">Hargreaves-Samani (temperature only) or FAO-56 Penman-Monteith (full data). Choose what
+            your data supports.</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">⚡</div>
+          <div class="feat-name">Works Offline</div>
+          <div class="feat-desc">All core processing is local. API calls are optional — SWIFT gracefully estimates solar
+            radiation via FAO-56 when offline.</div>
         </div>
       </div>
+    </div>
+  </section>
 
-      <div class="author-card">
-        <div class="author-avatar">AE</div>
-        <div class="author-name">Dr. Arunbabu E</div>
-        <div class="author-title">Associate Professor</div>
-        <div class="author-inst">Centre for Water Resources<br/>Anna University, Chennai</div>
-        <div class="author-divider"></div>
-        <div class="author-links">
-          <a class="author-link" href="https://www.linkedin.com/in/dr-arunbabu-elangovan-120076298/" target="_blank">⌥ LinkedIn</a>
-          <a class="author-link" href="mailto:arunbabu@annauniv.edu">⌥ arunbabu@annauniv.edu</a>
+  <!-- HOW IT WORKS -->
+  <section id="how">
+    <div class="container">
+      <div class="reveal">
+        <p class="s-label">Workflow</p>
+        <h2 class="s-title">Three steps to<br />SWAT+ ready files.</h2>
+      </div>
+      <div class="steps reveal">
+        <div class="step">
+          <div class="step-num">01</div>
+          <div class="step-title">Upload your data</div>
+          <div class="step-desc">Provide a stations metadata CSV and transposed multi-station CSVs for precipitation,
+            Tmax, and Tmin. Solar, humidity, and wind are optional.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <div class="step-title">Configure settings</div>
+          <div class="step-desc">Set your simulation date range, choose an ET method, select your output folder. SWIFT
+            resolves missing variables via NASA POWER or FAO-56.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <div class="step-title">Generate &amp; use</div>
+          <div class="step-desc">Click Generate. All .pcp, .tmp, .slr, .hmd, .wnd, .pet files and monthly.csv are
+            written directly to your SWAT+ project folder.</div>
         </div>
       </div>
-
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- FOOTER -->
-<footer>
-  <div class="footer-l"><span>SWIFT</span> — SWAT+ Input File Tool &nbsp;·&nbsp; v1.0 &nbsp;·&nbsp; © 2026 Antony Kishoare J</div>
-  <div class="footer-r">MIT Licensed &nbsp;·&nbsp; Anna University &nbsp;·&nbsp; DOI: 10.5281/zenodo.19402122</div>
-</footer>
+  <!-- OUTPUTS -->
+  <section id="outputs">
+    <div class="container">
+      <div class="reveal">
+        <p class="s-label">Output Files</p>
+        <h2 class="s-title">All files SWAT+ expects.<br />Ready to load.</h2>
+        <p class="s-body">The complete set of SWAT+ weather inputs, formatted to specification and written directly to
+          your project folder.</p>
+      </div>
+      <div class="outputs-grid reveal">
+        <div class="out-row"><span class="out-ext">.pcp</span>
+          <div>
+            <div class="out-name">Precipitation</div>
+            <div class="out-desc">Daily rainfall per station with header metadata</div>
+          </div>
+        </div>
+        <div class="out-row"><span class="out-ext">.tmp</span>
+          <div>
+            <div class="out-name">Temperature</div>
+            <div class="out-desc">Daily Tmax and Tmin per station</div>
+          </div>
+        </div>
+        <div class="out-row"><span class="out-ext">.slr</span>
+          <div>
+            <div class="out-name">Solar Radiation</div>
+            <div class="out-desc">From CSV, NASA POWER, or FAO-56 estimate</div>
+          </div>
+        </div>
+        <div class="out-row"><span class="out-ext">.hmd</span>
+          <div>
+            <div class="out-name">Humidity</div>
+            <div class="out-desc">Daily dewpoint — from RH%, dewpoint CSV, or NASA POWER</div>
+          </div>
+        </div>
+        <div class="out-row"><span class="out-ext">.wnd</span>
+          <div>
+            <div class="out-name">Wind Speed</div>
+            <div class="out-desc">Daily wind in m/s — from CSV or NASA POWER</div>
+          </div>
+        </div>
+        <div class="out-row"><span class="out-ext">.pet</span>
+          <div>
+            <div class="out-name">Potential ET</div>
+            <div class="out-desc">Daily ET₀ via Hargreaves-Samani or Penman-Monteith</div>
+          </div>
+        </div>
+        <div class="out-row"><span class="out-ext">.cli</span>
+          <div>
+            <div class="out-name">Climate Index Files</div>
+            <div class="out-desc">Auto-generated index files for each variable type</div>
+          </div>
+        </div>
+        <div class="out-row"><span class="out-ext">monthly.csv</span>
+          <div>
+            <div class="out-name">Weather Generator Stats</div>
+            <div class="out-desc">Complete monthly statistics table for SWAT+ wgn</div>
+          </div>
+        </div>
+        <div class="out-row"><span class="out-ext">stations.csv</span>
+          <div>
+            <div class="out-name">Updated Station Metadata</div>
+            <div class="out-desc">Elevation auto-filled + number of rain years computed</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<script>
-// Scroll reveal
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-}, {threshold: 0.1});
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  <!-- CITE -->
+  <section id="cite">
+    <div class="container">
+      <div class="reveal">
+        <p class="s-label">Citation</p>
+        <h2 class="s-title">If SWIFT helped<br />your research, cite it.</h2>
+        <p class="s-body">SWIFT has a permanent Zenodo DOI — citable in journal papers, theses, and reports.</p>
+      </div>
+      <div class="cite-box reveal">
+        <div class="cite-header">
+          <span>APA Format</span>
+          <button class="copy-btn" onclick="copyCite()">Copy</button>
+        </div>
+        <div class="cite-body" id="citeText">Antony Kishoare J. (2026). SWIFT: SWAT+ Input File Tool (v1.0.1). Zenodo.
+          https://doi.org/10.5281/zenodo.19425950</div>
+      </div>
+      <a class="doi-badge reveal" href="https://doi.org/10.5281/zenodo.19425950" target="_blank">
+        🔗 &nbsp;DOI: 10.5281/zenodo.19425950
+      </a>
+    </div>
+  </section>
 
-// Screenshot carousel
-const track = document.getElementById('ssTrack');
-const dots  = document.querySelectorAll('.ss-dot');
-const items = track.querySelectorAll('.ss-item');
-function updateDots() {
-  const w = track.scrollWidth / items.length;
-  const idx = Math.round(track.scrollLeft / w);
-  dots.forEach((d,i) => d.classList.toggle('active', i === idx));
-}
-track.addEventListener('scroll', updateDots, {passive:true});
-dots.forEach(dot => {
-  dot.addEventListener('click', () => {
-    const w = track.scrollWidth / items.length;
-    track.scrollTo({left: parseInt(dot.dataset.idx)*w, behavior:'smooth'});
-  });
-});
-let isDown=false, startX, scrollLeft;
-track.addEventListener('mousedown', e => { isDown=true; track.style.cursor='grabbing'; startX=e.pageX-track.offsetLeft; scrollLeft=track.scrollLeft; });
-['mouseleave','mouseup'].forEach(ev => track.addEventListener(ev, ()=>{ isDown=false; track.style.cursor='grab'; }));
-track.addEventListener('mousemove', e => {
-  if (!isDown) return; e.preventDefault();
-  track.scrollLeft = scrollLeft - (e.pageX - track.offsetLeft - startX)*1.5;
-});
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="container">
+      <div class="reveal">
+        <p class="s-label">About</p>
+        <h2 class="s-title">Built by hydrologists,<br />for hydrologists.</h2>
+      </div>
+      <div class="author-cards reveal">
 
-// Copy citation
-function copyCite() {
-  const text = document.getElementById('citeText').innerText;
-  navigator.clipboard.writeText(text).then(() => {
-    const btn = document.querySelector('.copy-btn');
-    btn.textContent = 'Copied!';
-    setTimeout(()=>btn.textContent='Copy', 2000);
-  });
-}
-</script>
+        <div class="author-card">
+          <div class="author-avatar">AKJ</div>
+          <div class="author-name">Antony Kishoare J</div>
+          <div class="author-title">PhD — AI/ML in Hydroclimatology, GIS &amp; Remote Sensing</div>
+          <div class="author-inst">Centre for Water Resources<br />Anna University, Chennai</div>
+          <div class="author-divider"></div>
+          <div class="author-links">
+            <a class="author-link" href="https://www.linkedin.com/in/antonykishoare/" target="_blank">⌥ LinkedIn</a>
+            <a class="author-link" href="mailto:a060697.ak@gmail.com">⌥ a060697.ak@gmail.com</a>
+          </div>
+        </div>
+
+        <div class="author-card">
+          <div class="author-avatar">AE</div>
+          <div class="author-name">Dr. Arunbabu E</div>
+          <div class="author-title">Associate Professor</div>
+          <div class="author-inst">Centre for Water Resources<br />Anna University, Chennai</div>
+          <div class="author-divider"></div>
+          <div class="author-links">
+            <a class="author-link" href="https://www.linkedin.com/in/dr-arunbabu-elangovan-120076298/" target="_blank">⌥
+              LinkedIn</a>
+            <a class="author-link" href="mailto:arunbabu@annauniv.edu">⌥ arunbabu@annauniv.edu</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-l"><span>SWIFT</span> — SWAT+ Input File Tool &nbsp;·&nbsp; v1.0.1 &nbsp;·&nbsp; © 2026 Antony
+      Kishoare J</div>
+    <div class="footer-r">MIT Licensed &nbsp;·&nbsp; Anna University &nbsp;·&nbsp; DOI: 10.5281/zenodo.19425950</div>
+  </footer>
+
+  <script>
+    // Scroll reveal
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // Screenshot carousel
+    const track = document.getElementById('ssTrack');
+    const dots = document.querySelectorAll('.ss-dot');
+    const items = track.querySelectorAll('.ss-item');
+    function updateDots() {
+      const w = track.scrollWidth / items.length;
+      const idx = Math.round(track.scrollLeft / w);
+      dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+    }
+    track.addEventListener('scroll', updateDots, { passive: true });
+    dots.forEach(dot => {
+      dot.addEventListener('click', () => {
+        const w = track.scrollWidth / items.length;
+        track.scrollTo({ left: parseInt(dot.dataset.idx) * w, behavior: 'smooth' });
+      });
+    });
+    let isDown = false, startX, scrollLeft;
+    track.addEventListener('mousedown', e => { isDown = true; track.style.cursor = 'grabbing'; startX = e.pageX - track.offsetLeft; scrollLeft = track.scrollLeft; });
+    ['mouseleave', 'mouseup'].forEach(ev => track.addEventListener(ev, () => { isDown = false; track.style.cursor = 'grab'; }));
+    track.addEventListener('mousemove', e => {
+      if (!isDown) return; e.preventDefault();
+      track.scrollLeft = scrollLeft - (e.pageX - track.offsetLeft - startX) * 1.5;
+    });
+
+    // Copy citation
+    function copyCite() {
+      const text = document.getElementById('citeText').innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy', 2000);
+      });
+    }
+  </script>
 </body>
+
 </html>
